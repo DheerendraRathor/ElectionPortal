@@ -1,0 +1,56 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_static admin_urls %}
+
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+        &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+        &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+        &rsaquo; <a
+            href="{% url opts|admin_urlname:'change' object.pk|admin_urlquote %}">{{ object|truncatewords:"18" }}</a>
+        &rsaquo; {% trans 'Add Voters' %}
+    </div>
+{% endblock %}
+
+{% block extrastyle %}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}"/>
+{% endblock %}
+
+{% block content %}
+    <div class="content-main">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div>
+                <fieldset class="module aligned">
+                    <div class="form-row field-voters-list">
+                        <label class="required" for="fileSelect">CSV file for voters list:</label>
+                        <input class="file-upload" name="voters_list" id="fileSelect" type="file" accept=".csv"
+                               placeholder="Upload csv file of voters list"/>
+                        <p class="help">File should have atleat one column that contains roll number and that should be
+                            valid for all rows. It should be a valid <b>Comma (',')</b> separated file</p>
+                    </div>
+                    <div class="form-row field-roll_col">
+                        <label class="required" for="roll_col">Roll Number Column</label>
+                        <input class="vIntegerField" name="roll_col" id="roll_col" type="number" min="0" value="0"/>
+                        <p class="help">Column in CSV which contains roll number. <b>Counting starts with 0.</b></p>
+                    </div>
+                    <div class="form-row field-roll_col">
+                        <label class="required" for="skip_one_row">Skip First Row?</label>
+                        <input class="vCheckboxField" name="skip_one_row" id="skip_one_row" type="checkbox"/>
+                        <p class="help">Check it if first row contains headers only</p>
+                    </div>
+                    <div class="form-row field-roll_col">
+                        <label class="required" for="skip_errors">Skip Errors Silently?</label>
+                        <input class="vCheckboxField" name="skip_errors" id="skip_errors" type="checkbox"/>
+                        <p class="help">Check it if you want to skip errors on invalid data. By default it will throw
+                            error on invalid data</p>
+                    </div>
+                </fieldset>
+                <div class="submit-row" style="text-align: inherit">
+                    <input style="float: none;" class="default" type="submit" value="Add"/>
+                </div>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}
