@@ -4,7 +4,7 @@ from django.contrib import admin
 from post.models import Post
 from .models import Election, Voter
 from .forms import NonSuperuserElectionForm
-from .views import AddVotersView
+from .views import AddVotersView, ElectionResultView
 from simple_history.admin import SimpleHistoryAdmin
 from post.utils import PostUtils
 from core.admin import RemoveDeleteSelectedMixin
@@ -65,6 +65,8 @@ class ElectionAdmin(RemoveDeleteSelectedMixin, SimpleHistoryAdmin):
         my_urls = [
             url(r'^(.+)/add_voters/',
                 self.admin_site.admin_view(AddVotersView.as_view()), name='election_election_add_voters_url'),
+            url(r'^(.+)/get_result/',
+                self.admin_site.admin_view(ElectionResultView.as_view()), name='election_election_get_election_result'),
         ]
         return my_urls + urls
 

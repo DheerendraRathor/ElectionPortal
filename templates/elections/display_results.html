@@ -1,0 +1,55 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_static admin_urls %}
+
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+        &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+        &rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+        &rsaquo; <a
+            href="{% url opts|admin_urlname:'change' object.pk|admin_urlquote %}">{{ object|truncatewords:"18" }}</a>
+        &rsaquo; {% trans 'Result' %}
+    </div>
+{% endblock %}
+
+{% block extrastyle %}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}"/>
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-main">
+        <h2>Total Registered Voters: {{ object.total_voters }}</h2>
+        <h2>Total Votes Casted: {{ object.votes_casted }}</h2>
+        <div class="inline-group">
+            <div class="tabular inline-related">
+                {% for post in posts %}
+                    <fieldset class="module">
+                        <h2>{{ post.name }}</h2>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th colspan="2" class="required">Candidate</th>
+                                <th class="required">Yes</th>
+                                <th class="required">No</th>
+                                <th class="required">Neutral</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for candidate in post.candidates.all %}
+                                    <tr class="row1">
+                                        <th colspan="2">{{ candidate.name }}</th>
+                                        <th>{{ candidate.yes_votes }}</th>
+                                        <th>{{ candidate.no_votes }}</th>
+                                        <th>{{ candidate.neutral_votes }}</th>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </fieldset>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

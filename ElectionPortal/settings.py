@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'simple_history',
     'election',
     'post',
+    'vote',
 ]
 
 MIDDLEWARE_CLASSES = [

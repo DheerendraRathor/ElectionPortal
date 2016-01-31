@@ -8,9 +8,9 @@ class Post(models.Model):
         [1, 'UG'],
         [2, 'PG'],
     ]
-    name = models.CharField(max_length=32)
+    name = models.CharField(max_length=32, db_index=True)
     number = models.IntegerField(default=1)
-    election = models.ForeignKey(Election, related_name='posts')
+    election = models.ForeignKey(Election, related_name='posts', db_index=True)
     type = models.IntegerField(choices=POST_TYPE, default=0)
 
     def __str__(self):
@@ -23,9 +23,9 @@ class Post(models.Model):
 
 
 class Candidate(models.Model):
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=64, db_index=True)
     image = models.ImageField(null=True, blank=True)
-    post = models.ForeignKey(Post)
+    post = models.ForeignKey(Post, related_name='candidates', db_index=True)
 
     def __str__(self):
         return self.name

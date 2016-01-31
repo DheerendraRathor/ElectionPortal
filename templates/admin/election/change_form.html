@@ -1,17 +1,26 @@
 {% extends "admin/change_form.html" %}
 {% load i18n admin_urls %}
 {% block object-tools-items %}
+    {% if original.is_finished or request.user.is_superuser %}
+        <li>
+            <a href="{% url opts|admin_urlname:'get_election_result' original.pk|admin_urlquote %}" class="historylink">Get
+                Results</a>
+        </li>
+    {% endif %}
     {% if opts.label_lower == 'election.election' %}
-    <li>
-        <a href="{% url opts|admin_urlname:'add_voters_url' original.pk|admin_urlquote %}" class="historylink">Add Voters</a>
-    </li>
+        <li>
+            <a href="{% url opts|admin_urlname:'add_voters_url' original.pk|admin_urlquote %}" class="historylink">Add
+                Voters</a>
+        </li>
     {% endif %}
     <li>
-        <a href="{% url opts|admin_urlname:'history' original.pk|admin_urlquote %}" class="historylink">{% trans "History" %}</a>
+        <a href="{% url opts|admin_urlname:'history' original.pk|admin_urlquote %}"
+           class="historylink">{% trans "History" %}</a>
     </li>
     {% if has_absolute_url %}
         <li>
-            <a href="{% url 'admin:view_on_site' content_type_id original.pk %}" class="viewsitelink">{% trans "View on site" %}</a>
+            <a href="{% url 'admin:view_on_site' content_type_id original.pk %}"
+               class="viewsitelink">{% trans "View on site" %}</a>
         </li>
     {% endif %}
 {% endblock %}

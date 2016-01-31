@@ -3,23 +3,31 @@ import csv
 
 from django.contrib import messages
 from django.db import transaction
+from django.db.models import Prefetch, Count, Sum, Case, When, IntegerField
 from django.http.response import Http404
-from django.shortcuts import get_object_or_404
 from django.views.generic import ListView
 from django.views.generic.base import TemplateView
 
 from core.core import IITB_ROLL_REGEX
+from post.models import Post, Candidate
 from .models import Election, Voter
 
 
 class AddVotersView(TemplateView):
     template_name = 'elections/add_voters.html'
 
-    def _validate_args(self, *args):
+    def _validate_args(self, request, *args):
         if len(args) < 1:
             raise Http404
-        self.object = get_object_or_404(Election, pk=args[0])
-        if self.object.is_finished:
+
+        qs = Election.objects.all().filter(pk=args[0])
+
+        if not request.user.is_superuser:
+            qs = qs.filter(creator=request.user, is_finished=False)
+
+        if len(qs) > 0:
+            self.object = qs[0]
+        else:
             raise Http404
 
     def get_context_data(self, **kwargs):
@@ -94,5 +102,44 @@ class AddVotersView(TemplateView):
         return self.get(self.request, *args, **kwargs)
 
 
-class GetElections(ListView):
-    queryset = Election.objects.all()
+class ElectionResultView(TemplateView):
+    template_name = 'elections/display_results.html'
+
+    def _validate_args(self, request, *args):
+        if len(args) < 1:
+            raise Http404
+        queryset = Election.objects.all().annotate(
+                total_voters=Count('voters'),
+                votes_casted=Sum(Case(When(voters__voted=True, then=1), default=0, output_field=IntegerField()))
+            ).filter(pk=args[0])
+
+        if not request.user.is_superuser:
+            queryset = queryset.filter(creator=request.user, is_finished=True)
+
+        if len(queryset) > 0:
+            self.object = queryset[0]
+        else:
+            raise Http404
+
+    def get_context_data(self, **kwargs):
+        kwargs['opts'] = Election._meta
+        kwargs['object'] = self.object
+        kwargs['title'] = 'Election Results'
+        return super().get_context_data(**kwargs)
+
+    def get(self, request, *args, **kwargs):
+        self._validate_args(request, *args)
+
+        posts = Post.objects.all().filter(election=self.object).prefetch_related(
+            Prefetch('candidates',
+                     queryset=Candidate.objects.all().annotate(
+                         yes_votes=Sum(Case(When(votes__yes=True, then=1), default=0, output_field=IntegerField())),
+                         no_votes=Sum(Case(When(votes__no=True, then=1), default=0, output_field=IntegerField())),
+                         neutral_votes=Sum(
+                             Case(When(votes__neutral=True, then=1), default=0, output_field=IntegerField())),
+                     ))
+        )
+
+        return super().get(request, *args, posts=posts, **kwargs)
+
+

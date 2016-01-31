@@ -5,13 +5,13 @@ from simple_history.models import HistoricalRecords
 
 
 class Election(models.Model):
-    name = models.CharField(max_length=64)
-    creator = models.ForeignKey(User, related_name='elections')
+    name = models.CharField(max_length=64, db_index=True)
+    creator = models.ForeignKey(User, related_name='elections', db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False, db_index=True)
     is_temporary_closed = models.BooleanField(default=False, help_text='Election temporary closed')
-    is_finished = models.BooleanField(default=False)
+    is_finished = models.BooleanField(default=False, db_index=True)
     finished_at = models.DateTimeField(blank=True, null=True)
     _history_ = HistoricalRecords()
 
@@ -33,10 +33,10 @@ class Election(models.Model):
 
 
 class Voter(models.Model):
-    roll_no = models.CharField(max_length=10)
+    roll_no = models.CharField(max_length=10, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    election = models.ForeignKey(Election, related_name='voters')
-    voted = models.BooleanField(default=False)
+    election = models.ForeignKey(Election, related_name='voters', db_index=True)
+    voted = models.BooleanField(default=False, db_index=True)
     voted_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
