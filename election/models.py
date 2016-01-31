@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
+from random import randint
 
 
 class Election(models.Model):
@@ -32,10 +33,15 @@ class Election(models.Model):
         return self.name
 
 
+def generate_random_voter_key():
+    return randint(10000, 99999)
+
+
 class Voter(models.Model):
     roll_no = models.CharField(max_length=10, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     election = models.ForeignKey(Election, related_name='voters', db_index=True)
+    key = models.IntegerField(default=generate_random_voter_key)
     voted = models.BooleanField(default=False, db_index=True)
     voted_at = models.DateTimeField(null=True, blank=True)
 

@@ -5,7 +5,6 @@ from django.contrib import messages
 from django.db import transaction
 from django.db.models import Prefetch, Count, Sum, Case, When, IntegerField
 from django.http.response import Http404
-from django.views.generic import ListView
 from django.views.generic.base import TemplateView
 
 from core.core import IITB_ROLL_REGEX

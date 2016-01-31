@@ -8,7 +8,6 @@ from .views import AddVotersView, ElectionResultView
 from simple_history.admin import SimpleHistoryAdmin
 from post.utils import PostUtils
 from core.admin import RemoveDeleteSelectedMixin
-from core.admin_filters import ElectionsFilter
 
 
 class PostInline(admin.TabularInline):
@@ -63,9 +62,9 @@ class ElectionAdmin(RemoveDeleteSelectedMixin, SimpleHistoryAdmin):
     def get_urls(self):
         urls = super().get_urls()
         my_urls = [
-            url(r'^(.+)/add_voters/',
+            url(r'^(.+)/add_voters/$',
                 self.admin_site.admin_view(AddVotersView.as_view()), name='election_election_add_voters_url'),
-            url(r'^(.+)/get_result/',
+            url(r'^(.+)/get_result/$',
                 self.admin_site.admin_view(ElectionResultView.as_view()), name='election_election_get_election_result'),
         ]
         return my_urls + urls
@@ -100,7 +99,7 @@ class ElectionAdmin(RemoveDeleteSelectedMixin, SimpleHistoryAdmin):
 @admin.register(Voter)
 class VoterAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
     list_display = ['roll_no', 'created_at', 'election']
-    list_filter = [ElectionsFilter]
+    list_filter = ['election']
     search_fields = ['roll_no']
 
     def get_fields(self, request, obj=None):
