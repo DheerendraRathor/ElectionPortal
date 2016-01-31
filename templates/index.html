@@ -1,0 +1,17 @@
+{% extends base_template %}
+
+{% block featurette %}
+    <main class="masthead" role="main">
+        <div class="container" style="color: #ffffff">
+            <h1 style="font-size: 110px;">IITB Elections</h1>
+            <p style="font-size: 30px; margin-bottom: 40px;">
+               A secure and reliable voting system for IITB.
+            </p>
+            <div class="row" style="padding: 32px">
+                <div class="col-md-12 form-group">
+                    <a href="{% url 'election:index' %}" class="btn btn-outline-inverse btn-lg">Election Home</a>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

@@ -14,6 +14,7 @@ class Election(models.Model):
     is_temporary_closed = models.BooleanField(default=False, help_text='Election temporary closed')
     is_finished = models.BooleanField(default=False, db_index=True)
     finished_at = models.DateTimeField(blank=True, null=True)
+    is_key_required = models.BooleanField(default=True)
     _history_ = HistoricalRecords()
 
     @property

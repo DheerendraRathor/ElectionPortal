@@ -1,0 +1,4 @@
+.disabled-candidate {
+    pointer-events: none;
+    background: grey;
+}

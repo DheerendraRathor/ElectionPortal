@@ -16,8 +16,19 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 import post.urls
+from .admin_config import config as admin_config
+import account.urls
+import election.urls
+from .views import IndexView
+
+
+admin_config()
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^$', IndexView.as_view(), name='index'),
     url(r'^post/', include(post.urls, namespace='post')),
+    url(r'^accounts/', include(account.urls, namespace='account')),
+    url(r'^election/', include(election.urls, namespace='election')),
 ]

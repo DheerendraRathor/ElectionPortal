@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+<head>
+    <title> {% block title %} IITB Elections {% endblock %} </title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/root.css' %}"/>
+    {% block cssLinks %}
+    {% endblock %}
+</head>
+
+<body>
+
+<div id="error-alert" class="alert alert-danger alert-dismissiable navbar-fixed-top container" role="alert"
+     style="z-index: 2000; max-width: 750px; display:none;">
+    <button id="error-alert-close" type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+            aria-hidden="true">×</span></button>
+    <span class="sr-only">Error:</span>
+    <div id="error-alert-content"></div>
+</div>
+
+<!-- Fixed navbar -->
+<nav class="navbar navbar-default" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{% url 'index' %}">Elections</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                {% block navbar_right_link %}
+                {% endblock %}
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</nav>
+
+{% block featurette %}
+{% endblock %}
+
+<div class="container">
+    {% block body %}
+    {% endblock %}
+
+    <div class="site-footer">
+        <div class="row text-center">
+            <div class="col-md-4 form-group">
+                &copy; {% now "Y" %} {{ request.get_host }}
+            </div>
+            <div class="col-md-2 form-group">
+                <a href="https://github.com/DheerendraRathor/ldap-oauth2/blob/master/contributors.md" target="_blank">Contributors</a>
+            </div>
+            <div class="col-md-2 form-group">
+                <a href="https://github.com/DheerendraRathor/ldap-oauth2/" target="_blank">Source Code</a>
+            </div>
+            <div class="col-md-2 form-group">
+                <a href="https://github.com/DheerendraRathor/ldap-oauth2/issues" target="_blank">Bugs || Suggestions</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/cookie.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/root.js' %}"></script>
+{% block jsLinks %}
+{% endblock %}
+</body>
+</html>

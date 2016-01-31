@@ -1,0 +1,9 @@
+{% extends 'logged_in.html' %}
+
+{% block body %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Login"/>
+    </form>
+{% endblock %}

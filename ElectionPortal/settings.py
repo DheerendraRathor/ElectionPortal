@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+import ldap
+from django_auth_ldap.config import LDAPSearch
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -28,6 +30,30 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+AUTHENTICATION_BACKENDS = (
+    'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+AUTH_LDAP_SERVER_URI = 'ldap://ldap.iitb.ac.in'
+
+AUTH_LDAP_BIND_DN = ''
+AUTH_LDAP_BIND_PASSWORD = ''
+AUTH_LDAP_USER_SEARCH = LDAPSearch('ou=People,dc=iitb,dc=ac,dc=in',
+                                   ldap.SCOPE_SUBTREE, '(uid=%(user)s)')
+
+AUTH_LDAP_USER_ATTR_MAP = {
+    'first_name': 'givenName',
+    'last_name': 'sn',
+    'email': 'mail',
+}
+
+AUTH_PROFILE_MODULE = 'account.UserProfile'
+
+AUTH_LDAP_PROFILE_ATTR_MAP = {
+    'roll_number': 'employeeNumber',
+}
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -41,6 +67,7 @@ INSTALLED_APPS = [
     'election',
     'post',
     'vote',
+    'account',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -125,3 +152,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static/'),
+]

@@ -6,6 +6,7 @@ from django.db import transaction
 from django.db.models import Prefetch, Count, Sum, Case, When, IntegerField
 from django.http.response import Http404
 from django.views.generic.base import TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from core.core import IITB_ROLL_REGEX
 from post.models import Post, Candidate
@@ -108,9 +109,9 @@ class ElectionResultView(TemplateView):
         if len(args) < 1:
             raise Http404
         queryset = Election.objects.all().annotate(
-                total_voters=Count('voters'),
-                votes_casted=Sum(Case(When(voters__voted=True, then=1), default=0, output_field=IntegerField()))
-            ).filter(pk=args[0])
+            total_voters=Count('voters'),
+            votes_casted=Sum(Case(When(voters__voted=True, then=1), default=0, output_field=IntegerField()))
+        ).filter(pk=args[0])
 
         if not request.user.is_superuser:
             queryset = queryset.filter(creator=request.user, is_finished=True)
@@ -142,3 +143,20 @@ class ElectionResultView(TemplateView):
         return super().get(request, *args, posts=posts, **kwargs)
 
 
+class ElectionView(LoginRequiredMixin, TemplateView):
+    template_name = 'elections/election_view.html'
+
+    def get(self, request, *args, **kwargs):
+        user = self.request.user
+        profile = user.user_profile
+        elections = Election.objects.all().filter(
+            is_active=True, is_temporary_closed=False, is_finished=False,
+            voters__roll_no__iexact=profile.roll_number
+        ).prefetch_related(
+            'posts__candidates',
+            Prefetch('voters', queryset=Voter.objects.all().filter(roll_no__iexact=profile.roll_number),
+                     to_attr='voter'),
+        ).order_by('id')
+
+        kwargs['elections'] = elections
+        return super().get(request, *args, **kwargs)

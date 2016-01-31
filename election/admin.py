@@ -1,5 +1,8 @@
+import csv
+
 from django.conf.urls import url
 from django.contrib import admin
+from django.http.response import HttpResponse
 
 from post.models import Post
 from .models import Election, Voter
@@ -28,6 +31,26 @@ class PostInline(admin.TabularInline):
 class ElectionAdmin(RemoveDeleteSelectedMixin, SimpleHistoryAdmin):
     list_display = ['name', 'creator', 'created_at', 'is_active', 'is_finished']
     inlines = [PostInline]
+    actions = ['download_voters_action']
+
+    def download_voters_action(self, request, queryset):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="voters.csv"'
+        writer = csv.writer(response)
+
+        queryset = queryset.prefetch_related('voters')
+        index = 1
+
+        writer.writerow(['S.No.', 'Election Name', 'Voter Roll Number', 'Passkey'])
+
+        for election in queryset:
+            for voter in election.voters.all():
+                writer.writerow([index, election.name, voter.roll_no, voter.key])
+                index += 1
+
+        return response
+
+    download_voters_action.short_description = 'Download voters data'
 
     def get_readonly_fields(self, request, obj=None):
         if not obj or request.user.is_superuser:

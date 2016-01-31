@@ -37,7 +37,7 @@
                             </thead>
                             <tbody>
                                 {% for candidate in post.candidates.all %}
-                                    <tr class="row1">
+                                    <tr class="{% cycle "row1" "row2" %}">
                                         <th colspan="2">{{ candidate.name }}</th>
                                         <th>{{ candidate.yes_votes }}</th>
                                         <th>{{ candidate.no_votes }}</th>

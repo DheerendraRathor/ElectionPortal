@@ -1,0 +1,16 @@
+{% extends 'root.html' %}
+
+{% block navbar_right_link %}
+
+    <li><a href="{% url 'election:index' %}"><strong>
+        {{ request.user.username }}
+    </strong></a></li>
+    <li>
+        <form style="padding: 15px;"
+              action="{% url 'account:logout' %}{% if request.uri %}?next={{ request.uri|urlencode }}{% endif %}"
+              method="post">
+            {% csrf_token %}
+            <input class="btn btn-primary" type="submit" value="Logout"/>
+        </form>
+    </li>
+{% endblock %}
