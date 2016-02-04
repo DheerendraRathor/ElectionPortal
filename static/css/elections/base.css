@@ -2,3 +2,45 @@
     pointer-events: none;
     background: grey;
 }
+
+.accepted-candidate {
+    background: lightgreen;
+}
+
+.rejected-candidate {
+    background: #d9534f;
+}
+
+.election-vote-cast {
+    margin-left: 20px;
+    padding: 20px 20px 20px 0;
+    background: lightcoral;
+}
+
+.post-list {
+    margin-left: 20px;
+    background: beige;
+}
+
+.post {
+    padding: 5px 5px 5px 15px;
+}
+
+.post-title {
+    margin-top: 10px;
+}
+
+.candidate-list {
+    margin-left: 10px;
+}
+
+.election {
+    padding: 10px;
+    background: darkgray;
+}
+
+.election-title {
+    margin-top: 10px;
+    color: cornsilk;
+    font-family: serif;
+}
