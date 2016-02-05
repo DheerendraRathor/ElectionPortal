@@ -35,7 +35,7 @@ class Election(models.Model):
 
 
 class Tag(models.Model):
-    tag = models.CharField(max_length=16)
+    tag = models.SlugField(max_length=16, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User)
