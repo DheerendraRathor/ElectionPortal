@@ -64,7 +64,10 @@
 
                     {% for post in election.posts.all %}
                         <div class="post" id="post-{{ post.id }}" data-count="{{ post.number }}">
-                            <h3 class="post-title">{{ post.name }} - {{ post.number }}</h3>
+                        <div class="text-center text-capitalize text-info">
+                            <h3 class="post-title">{{ post }}</h3>
+                            <h3 class="post-title">Available Posts: {{ post.number }}</h3>
+                        </div>
                             <div class="row candidate-list">
                                 {% for candidate in post.candidates.all %}
                                     <div id="candidate-{{ candidate.id }}" class="candidate col-sm-4 col-md-3">
@@ -77,7 +80,7 @@
                                                      {% static 'img/default_user.png' %}{% endif %}"
                                             >
 
-                                            <div class="caption">
+                                            <div class="caption text-capitalize">
                                                 <h4>{{ candidate.name }}</h4>
                                                 <div class="radio">
                                                     <input name="candidate-{{ candidate.id }}"

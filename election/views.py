@@ -6,16 +6,17 @@ from django.contrib.admin import site
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.db.models import Prefetch, Count, Sum, Case, When, IntegerField
+from django.db.models import Case, Count, IntegerField, Prefetch, Sum, When
 from django.forms.widgets import SelectMultiple
 from django.http.response import Http404
 from django.views.generic.base import TemplateView
 
 from account.views import VoterLogoutView
-from core.core import IITB_ROLL_REGEX, AlertTags
-from post.models import Post, Candidate
+from core.core import IITB_ROLL_REGEX, AlertTags, PostTypes
+from post.models import Candidate, Post
 from vote.models import Vote
-from .models import Election, Voter, Tag
+
+from .models import Election, Tag, Voter
 from .serializers import AddVoteSerializer
 
 
@@ -192,13 +193,20 @@ class ElectionView(LoginRequiredMixin, TemplateView):
         user = self.request.user
         profile = user.user_profile
 
+        # TODO: This is kinda hack-y. Try to clean it up to make it more scalable
+        post_types = [PostTypes.ALL]
+        if profile.is_ug:
+            post_types.append(PostTypes.UG)
+        if profile.is_pg:
+            post_types.append(PostTypes.PG)
+
         election = Election.objects.all().filter(
             is_active=True, is_temporary_closed=False, is_finished=False,
             voters__roll_no__iexact=profile.roll_number, voters__voted=False
         ).prefetch_related(
             Prefetch(
                 'posts',
-                queryset=Post.objects.all().filter().order_by('order').prefetch_related('candidates'),
+                queryset=Post.objects.all().filter(type__in=post_types).order_by('order').prefetch_related('candidates'),
             ),
             Prefetch('voters', queryset=Voter.objects.all().filter(roll_no__iexact=profile.roll_number),
                      to_attr='voter'),

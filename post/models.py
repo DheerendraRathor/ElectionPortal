@@ -1,18 +1,14 @@
 from django.db import models
 
+from core.core import POST_TYPE_CHOICES
 from election.models import Election
 
 
 class Post(models.Model):
-    POST_TYPE = [
-        [0, 'ALL'],
-        [1, 'UG'],
-        [2, 'PG'],
-    ]
     name = models.CharField(max_length=32, db_index=True)
     number = models.IntegerField(default=1)
     election = models.ForeignKey(Election, related_name='posts', db_index=True)
-    type = models.IntegerField(choices=POST_TYPE, default=0)
+    type = models.IntegerField(choices=POST_TYPE_CHOICES, default=0)
     order = models.PositiveSmallIntegerField(default=0)
 
     def __str__(self):

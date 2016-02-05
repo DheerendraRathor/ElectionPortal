@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
 import os
+
 import ldap
 from django_auth_ldap.config import LDAPSearch
 
@@ -69,6 +70,7 @@ INSTALLED_APPS = [
     'post',
     'vote',
     'account',
+    'core',
 ]
 
 MIDDLEWARE_CLASSES = [

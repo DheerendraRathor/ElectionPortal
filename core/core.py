@@ -33,3 +33,9 @@ POST_TYPE_CHOICES = [
     (PostTypes.UG, 'UG'),
     (PostTypes.PG, 'PG'),
 ]
+
+CAN_VOTE = ['UG', 'PG', 'DD']
+
+UG_TYPE = ['UG', 'DD']
+
+PG_TYPE = ['PG']

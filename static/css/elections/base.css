@@ -4,11 +4,16 @@
 }
 
 .accepted-candidate {
-    background: lightgreen;
+    background: #176b17;
 }
 
 .rejected-candidate {
-    background: #d9534f;
+    background: #810400;
+}
+
+.accepted-candidate .caption,
+.rejected-candidate .caption {
+    color: white;
 }
 
 .election-vote-cast {
