@@ -44,3 +44,18 @@
     color: cornsilk;
     font-family: serif;
 }
+
+.affix {
+    z-index: 100;
+    top: 10px;
+    right: 5px;
+}
+
+.blink{
+    animation:blink 700ms infinite alternate;
+}
+
+@keyframes blink {
+    from { opacity:1; }
+    to { opacity:0.4; }
+}

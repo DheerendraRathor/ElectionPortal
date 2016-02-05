@@ -5,7 +5,7 @@ from django.contrib import admin
 from django.http.response import HttpResponse
 
 from post.models import Post
-from .models import Election, Voter
+from .models import Election, Voter, Tag
 from .forms import NonSuperuserElectionForm
 from .views import AddVotersView, ElectionResultView
 from simple_history.admin import SimpleHistoryAdmin
@@ -149,3 +149,15 @@ class VoterAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return self.has_change_permission(request, obj)
+
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ['tag', 'created_by']
+    search_fields = ['tag']
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser

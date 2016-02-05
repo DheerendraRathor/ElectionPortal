@@ -6,7 +6,7 @@ class PostUtils(object):
     def get_post_read_only_fields(request, election):
         if not election or request.user.is_superuser:
             return []
-        if election.is_finished or (election.is_active and not election.is_temporary_closed):
+        if election.creator != request.user or election.has_activated:
             return ['name', 'type', 'number']
         return []
 
@@ -14,6 +14,6 @@ class PostUtils(object):
     def has_delete_permission(request, election):
         if not election or request.user.is_superuser:
             return True
-        if election.is_finished or (election.is_active and not election.is_temporary_closed):
+        if election.creator != request.user or election.has_activated:
             return False
         return True

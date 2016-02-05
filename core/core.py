@@ -13,3 +13,9 @@ IITB_ROLL_REGEX = re.compile(r'^' +
                              r'$',
                              re.IGNORECASE
                              )
+
+
+class AlertTags(object):
+    DANGER = 'alert alert-danger'
+    INFO = 'alert alert-info'
+    SUCCESS = 'alert alert-success'

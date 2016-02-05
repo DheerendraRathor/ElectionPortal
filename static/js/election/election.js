@@ -53,16 +53,17 @@ function reset_post_candidates(post) {
 
 }
 
-$('.cast-vote').click(function (event) {
-    event.preventDefault();
+$('#submit-vote').submit(function (event) {
+
     var election = $(this).data('election');
     var election_votes = $('#election-{0} input:checked'.format(election));
 
     var voter_vote = {};
 
     election_votes.each(function() {
-        voter_vote[$(this).data('candidate')] = $(this).val();
+        voter_vote[$(this).data('candidate')] = parseInt($(this).val());
     });
 
-    
+    $("#submit-form-votes-inp").val(JSON.stringify(voter_vote));
+
 });

@@ -1,5 +1,10 @@
 {% extends "admin/base_site.html" %}
-{% load i18n admin_static admin_urls %}
+{% load i18n admin_urls admin_static admin_modify %}
+
+{% block extrahead %}{{ block.super }}
+    <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+    {{ media }}
+{% endblock %}
 
 {% block breadcrumbs %}
     <div class="breadcrumbs">
@@ -34,6 +39,12 @@
                         <input class="vIntegerField" name="roll_col" id="roll_col" type="number" min="0" value="0"/>
                         <p class="help">Column in CSV which contains roll number. <b>Counting starts with 0.</b></p>
                     </div>
+                    <div class="form-row field-tags">
+                        <label class="required" for="tags">Tags</label>
+                        {{ tags_related }}
+                        <p class="help">Tag voters. Keep simple tags like 'hostel9', 'h_15_wing_a' etc. Use Ctrl + Click
+                            to select multiple. <b style="color: red;">Maximum 5 tags are allowed</b> </p>
+                    </div>
                     <div class="form-row field-roll_col">
                         <label class="required" for="skip_one_row">Skip First Row?</label>
                         <input class="vCheckboxField" name="skip_one_row" id="skip_one_row" type="checkbox"/>
@@ -54,3 +65,35 @@
         </form>
     </div>
 {% endblock %}
+
+{% block admin_change_form_document_ready %}
+    <script type="text/javascript">
+        (function ($) {
+            $(document).ready(function () {
+                $('.add-another').click(function (e) {
+                    e.preventDefault();
+                    var event = $.Event('django:add-another-related');
+                    $(this).trigger(event);
+                    if (!event.isDefaultPrevented()) {
+                        showAddAnotherPopup(this);
+                    }
+                });
+                $('.related-lookup').click(function (e) {
+                    e.preventDefault();
+                    var event = $.Event('django:lookup-related');
+                    $(this).trigger(event);
+                    if (!event.isDefaultPrevented()) {
+                        showRelatedObjectLookupPopup(this);
+                    }
+                });
+
+                {% if adminform and add %}
+                    $('form#{{ opts.model_name }}_form :input:visible:enabled:first').focus()
+                {% endif %}
+            });
+        })(django.jQuery);
+    </script>
+{% endblock %}
+
+{# JavaScript for prepopulated fields #}
+{% prepopulated_fields_js %}

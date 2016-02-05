@@ -1,7 +1,7 @@
-{% extends 'logged_in.html' %}
+{% extends 'root.html' %}
 
 {% block body %}
-    <form method="post">
+    <form class="form-horizontal" method="post">
         {% csrf_token %}
         {{ form }}
         <input type="submit" value="Login"/>

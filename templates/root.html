@@ -13,14 +13,6 @@
 
 <body>
 
-<div id="error-alert" class="alert alert-danger alert-dismissiable navbar-fixed-top container" role="alert"
-     style="z-index: 2000; max-width: 750px; display:none;">
-    <button id="error-alert-close" type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-            aria-hidden="true">×</span></button>
-    <span class="sr-only">Error:</span>
-    <div id="error-alert-content"></div>
-</div>
-
 <!-- Fixed navbar -->
 <nav class="navbar navbar-default" role="navigation">
     <div class="container">
@@ -47,6 +39,18 @@
 {% endblock %}
 
 <div class="container">
+
+    {% if messages %}
+        <ul class="messages" style="list-style-type: none; padding-left: 0;">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                    {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}Important: {% endif %}
+                    {{ message }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
     {% block body %}
     {% endblock %}
 
@@ -54,15 +58,6 @@
         <div class="row text-center">
             <div class="col-md-4 form-group">
                 &copy; {% now "Y" %} {{ request.get_host }}
-            </div>
-            <div class="col-md-2 form-group">
-                <a href="https://github.com/DheerendraRathor/ldap-oauth2/blob/master/contributors.md" target="_blank">Contributors</a>
-            </div>
-            <div class="col-md-2 form-group">
-                <a href="https://github.com/DheerendraRathor/ldap-oauth2/" target="_blank">Source Code</a>
-            </div>
-            <div class="col-md-2 form-group">
-                <a href="https://github.com/DheerendraRathor/ldap-oauth2/issues" target="_blank">Bugs || Suggestions</a>
             </div>
         </div>
     </div>

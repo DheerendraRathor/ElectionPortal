@@ -13,17 +13,37 @@
         var post_count = {};
         var post_selection = {};
         var post_candidates = {};
-        {% for election in elections %}
-            {% for post in election.posts.all %}
-                post_count[{{ post.id }}] = {{ post.number }};
-                post_selection[{{ post.id }}] = [];
-                post_candidates[{{ post.id }}] = [
-                    {% for candidate in post.candidates.all %}
-                        {{ candidate.id }}{% if not forloop.last %},{% endif %}
-                    {% endfor %}
-                ];
-            {% endfor %}
+        {% for post in election.posts.all %}
+            post_count[{{ post.id }}] = {{ post.number }};
+            post_selection[{{ post.id }}] = [];
+            post_candidates[{{ post.id }}] = [
+                {% for candidate in post.candidates.all %}
+                    {{ candidate.id }}{% if not forloop.last %},{% endif %}
+                {% endfor %}
+            ];
         {% endfor %}
+
+        var session_seconds = {{ session_timeout }};
+        var $session_alert_div = $("#session-alert");
+        var session_in_danger = false;
+
+        var session_interval = window.setInterval(function(){
+            if (session_seconds < 60 && !session_in_danger){
+                $session_alert_div.removeClass('alert-warning');
+                $session_alert_div.addClass('alert-danger');
+                $session_alert_div.addClass('blink');
+                session_in_danger = true;
+            }
+
+            if (session_seconds <= 0){
+                clearInterval(session_interval);
+                window.location.reload();
+            }
+
+            $("#session-timeout").text(session_seconds);
+            session_seconds -= 1;
+
+        }, 1000);
 
     </script>
     <script type="text/javascript" src="{% static 'js/election/election.js' %}"></script>
@@ -31,96 +51,99 @@
 
 {% block body %}
 
-    <div class="row" xmlns="http://www.w3.org/1999/html">
-        <div class="col-md-12 election">
-            {% for election in elections %}
-                <div id="election-{{ election.id }}">
-                    <h1 class="election-title">{{ election.name }}</h1>
-                    {% if election.voter.voted %}
-                        <h2 style="color: red;">You have already voted</h2>
-                    {% else %}
-                        <div class="post-list">
+    <div class="row">
 
-                            {% for post in election.posts.all %}
-                                <div class="post" id="post-{{ post.id }}" data-count="{{ post.number }}">
-                                    <h3 class="post-title">{{ post.name }} - {{ post.number }}</h3>
-                                    <div class="row candidate-list">
-                                        {% for candidate in post.candidates.all %}
-                                            <div id="candidate-{{ candidate.id }}" class="candidate col-md-2">
-                                                <div id="candidate-{{ candidate.id }}-poster"
-                                                     class="candidate-poster thumbnail"
-                                                     data-candidate="{{ candidate.id }}"
-                                                >
-                                                    <img src="
+        <div id="session-alert" class="alert alert-warning pull-right" data-spy="affix" data-offset-top="60">
+            <strong>Session expiring in: <span id="session-timeout">{{ session_timeout }}</span>s</strong>
+        </div>
+
+        <div class="col-md-12 election">
+            <div id="election-{{ election.id }}">
+                <h1 class="election-title">{{ election.name }}</h1>
+                <div class="post-list">
+
+                    {% for post in election.posts.all %}
+                        <div class="post" id="post-{{ post.id }}" data-count="{{ post.number }}">
+                            <h3 class="post-title">{{ post.name }} - {{ post.number }}</h3>
+                            <div class="row candidate-list">
+                                {% for candidate in post.candidates.all %}
+                                    <div id="candidate-{{ candidate.id }}" class="candidate col-md-3">
+                                        <div id="candidate-{{ candidate.id }}-poster"
+                                             class="candidate-poster thumbnail"
+                                             data-candidate="{{ candidate.id }}"
+                                        >
+                                            <img src="
                                         {% if candidate.image %}{{ candidate.image.url }}
                                         {% else %}
                                             {% static 'img/default_user.png' %}
                                         {% endif %}
                                         " alt="candidate image">
-                                                    <div class="caption">
-                                                        <h4>{{ candidate.name }}</h4>
-                                                        <div class="radio">
-                                                            <input name="candidate-{{ candidate.id }}"
-                                                                   id="candidate-{{ candidate.id }}-yes"
-                                                                   type="radio"
-                                                                   value="1"
-                                                                   data-post="{{ post.id }}"
-                                                                   data-candidate="{{ candidate.id }}"
-                                                            />
-                                                            <label for="candidate-{{ candidate.id }}-yes">
-                                                                Yes
-                                                            </label>
-                                                        </div>
-                                                        <div class="radio">
-                                                            <input name="candidate-{{ candidate.id }}"
-                                                                   id="candidate-{{ candidate.id }}-no"
-                                                                   type="radio"
-                                                                   value="-1"
-                                                                   data-post="{{ post.id }}"
-                                                                   data-candidate="{{ candidate.id }}"
-                                                            />
-                                                            <label for="candidate-{{ candidate.id }}-no">
-                                                                No
-                                                            </label>
-                                                        </div>
-                                                        <div class="radio">
-                                                            <input name="candidate-{{ candidate.id }}"
-                                                                   id="candidate-{{ candidate.id }}-neutral"
-                                                                   type="radio"
-                                                                   value="0"
-                                                                   data-post="{{ post.id }}"
-                                                                   data-candidate="{{ candidate.id }}"
-                                                                   checked
-                                                            />
-                                                            <label for="candidate-{{ candidate.id }}-neutral">
-                                                                Neutral
-                                                            </label>
-                                                        </div>
-                                                    </div>
+                                            <div class="caption">
+                                                <h4>{{ candidate.name }}</h4>
+                                                <div class="radio">
+                                                    <input name="candidate-{{ candidate.id }}"
+                                                           id="candidate-{{ candidate.id }}-yes"
+                                                           type="radio"
+                                                           value="1"
+                                                           data-post="{{ post.id }}"
+                                                           data-candidate="{{ candidate.id }}"
+                                                    />
+                                                    <label for="candidate-{{ candidate.id }}-yes">
+                                                        Yes
+                                                    </label>
+                                                </div>
+                                                <div class="radio">
+                                                    <input name="candidate-{{ candidate.id }}"
+                                                           id="candidate-{{ candidate.id }}-no"
+                                                           type="radio"
+                                                           value="-1"
+                                                           data-post="{{ post.id }}"
+                                                           data-candidate="{{ candidate.id }}"
+                                                    />
+                                                    <label for="candidate-{{ candidate.id }}-no">
+                                                        No
+                                                    </label>
+                                                </div>
+                                                <div class="radio">
+                                                    <input name="candidate-{{ candidate.id }}"
+                                                           id="candidate-{{ candidate.id }}-neutral"
+                                                           type="radio"
+                                                           value="0"
+                                                           data-post="{{ post.id }}"
+                                                           data-candidate="{{ candidate.id }}"
+                                                           checked
+                                                    />
+                                                    <label for="candidate-{{ candidate.id }}-neutral">
+                                                        Neutral
+                                                    </label>
                                                 </div>
                                             </div>
-                                        {% endfor %}
+                                        </div>
                                     </div>
-                                </div>
-                            {% endfor %}
+                                {% endfor %}
+                            </div>
                         </div>
-                    {% endif %}
+                        <hr>
+                    {% endfor %}
+                </div>
 
-                    <div class="election-vote-cast">
+                <div class="election-vote-cast">
+                    <form method="post" id="submit-vote" data-election="{{ election.id }}">
+                        {% csrf_token %}
+                        <input type="hidden" name="election" value="{{ election.id }}"/>
+                        <input type="hidden" name="votes" id="submit-form-votes-inp"/>
                         {% if election.is_key_required %}
                             <div class="form-group col-xs-3">
                                 <label class="sr-only" for="election-{{ election.id }}-submit">Key</label>
-                                <input class="form-control" type="text" placeholder="Voting Key" name="voting-key"
-                                       id="election-{{ election.id }}-submit"/>
+                                <input class="form-control" type="text" placeholder="Voting Key" name="key"
+                                       id="election-{{ election.id }}-key-input" required/>
                             </div>
                         {% endif %}
                         <button class="btn btn-primary cast-vote" data-election="{{ election.id }}">Cast Vote
                         </button>
-                    </div>
+                    </form>
                 </div>
-            {% empty %}
-                <h2>There is no active election for you currently</h2>
-            {% endfor %}
+            </div>
         </div>
     </div>
 

@@ -2,15 +2,21 @@ import codecs
 import csv
 
 from django.contrib import messages
+from django.contrib.admin import site
+from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Prefetch, Count, Sum, Case, When, IntegerField
+from django.forms.widgets import SelectMultiple
 from django.http.response import Http404
 from django.views.generic.base import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
 
-from core.core import IITB_ROLL_REGEX
+from account.views import VoterLogoutView
+from core.core import IITB_ROLL_REGEX, AlertTags
 from post.models import Post, Candidate
-from .models import Election, Voter
+from vote.models import Vote
+from .models import Election, Voter, Tag
+from .serializers import AddVoteSerializer
 
 
 class AddVotersView(TemplateView):
@@ -37,16 +43,46 @@ class AddVotersView(TemplateView):
         return super().get_context_data(**kwargs)
 
     def get(self, request, *args, **kwargs):
-        self._validate_args(*args)
+        self._validate_args(request, *args)
+
+        tags = Tag.objects.all().values_list('id', 'tag')
+
+        tags_list = SelectMultiple(choices=tags)
+        voter_opts = Voter._meta
+        tag_field = voter_opts.many_to_many[0]
+        model_admin = site._registry[Voter]
+        admin_tags_list = RelatedFieldWidgetWrapper(
+            tags_list,
+            tag_field.remote_field,
+            site,
+            True,
+            False,
+            False)
+        media = model_admin.media
+        kwargs['media'] = media
+        kwargs['tags_related'] = admin_tags_list.render('tags', None, attrs={
+            'id': 'id_tags',
+        })
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        self._validate_args(*args)
+        self._validate_args(request, *args)
 
         file = request.FILES.get('voters_list', None)
         roll_column = request.POST.get('roll_col', 0)
         skip_one_row = 'skip_one_row' in request.POST
         skip_errors = 'skip_errors' in request.POST
+        tags_list = request.POST.getlist('tags', [])
+
+        tags = Tag.objects.all().filter(pk__in=tags_list)
+
+        if len(tags) != len(tags_list):
+            messages.add_message(self.request, messages.ERROR, 'Invalid tags found. Aborted.')
+            return self.get(self.request, *args, **kwargs)
+
+        if len(tags) > 5:
+            messages.add_message(self.request, messages.ERROR, 'Maximum 5 tags are allowed')
+            return self.get(self.request, *args, **kwargs)
 
         if not file:
             messages.add_message(self.request, messages.ERROR, 'File can not be empty')
@@ -64,6 +100,7 @@ class AddVotersView(TemplateView):
 
         try:
             with transaction.atomic():
+                voter_list = []
                 for row in reader:
                     index += 1
                     if skip_one_row and index == 1:  # First Row
@@ -87,9 +124,13 @@ class AddVotersView(TemplateView):
 
                     roll_number = roll_number.upper()
 
-                    _, created = Voter.objects.get_or_create(roll_no=roll_number, election=self.object)
+                    voter, created = Voter.objects.get_or_create(roll_no=roll_number, election=self.object)
                     if created:
                         new_voters_added += 1
+                    voter_list.append(voter)
+
+                for tag in tags:
+                    tag.voter_set.add(*voter_list)
 
         except (IndexError, ValueError):
             messages.add_message(self.request, messages.ERROR, message)
@@ -146,17 +187,120 @@ class ElectionResultView(TemplateView):
 class ElectionView(LoginRequiredMixin, TemplateView):
     template_name = 'elections/election_view.html'
 
-    def get(self, request, *args, **kwargs):
+    def _get_next_election(self):
         user = self.request.user
         profile = user.user_profile
-        elections = Election.objects.all().filter(
+
+        election = Election.objects.all().filter(
             is_active=True, is_temporary_closed=False, is_finished=False,
-            voters__roll_no__iexact=profile.roll_number
+            voters__roll_no__iexact=profile.roll_number, voters__voted=False
         ).prefetch_related(
             'posts__candidates',
             Prefetch('voters', queryset=Voter.objects.all().filter(roll_no__iexact=profile.roll_number),
                      to_attr='voter'),
-        ).order_by('id')
+        ).order_by('id').first()
 
-        kwargs['elections'] = elections
+        self.election = election
+        return election
+
+    def get(self, request, *args, **kwargs):
+        election = self._get_next_election()
+
+        if not election:
+            messages.add_message(request, messages.INFO,
+                                 'No election available for you now',
+                                 AlertTags.INFO)
+            request.method = 'POST'
+            return VoterLogoutView.as_view()(request)
+
+        vote_added = kwargs.pop('vote_added', False)
+        if vote_added:
+            # Uncomment following line to extend session for each election
+            # request.session.set_expiry(timedelta(seconds=settings.VOTER_SESSION_TIMEOUT))
+            pass
+
+        kwargs['election'] = election
+        kwargs['session_timeout'] = request.session.get_expiry_age()
+
         return super().get(request, *args, **kwargs)
+
+    # TODO: Log errors
+    # Todo: Add UG PG validation
+    def post(self, request):
+
+        serialized_data = AddVoteSerializer(data=request.body)
+
+        if serialized_data.is_valid():
+            election = self._get_next_election()
+
+            if not election or election.pk != serialized_data.validated_data['election']:
+                messages.add_message(request, messages.ERROR,
+                                     'We got invalid data. This incident is logged',
+                                     AlertTags.DANGER)
+                return self.get(request)
+
+            # Validate is valid voter
+            voters = election.voter
+            voter = voters[0]
+            if len(voters) != 1:
+                messages.add_message(request, messages.ERROR,
+                                     'You\'re not a voter.',
+                                     AlertTags.DANGER)
+                return self.get(request)
+
+            # Validate key
+            if election.is_key_required:
+                if serialized_data.validated_data['key'] != voter.key:
+                    messages.add_message(request, messages.ERROR,
+                                         'Invalid Key. This incident is logged',
+                                         AlertTags.DANGER)
+                    return self.get(request)
+
+            votes = serialized_data.validated_data['votes']
+            keys = dict()
+            for key, value in votes.items():
+                keys[key] = (False, value)
+
+            for post in election.posts.all():
+                for candidate in post.candidates.all():
+                    if candidate.id not in keys:
+                        messages.add_message(request, messages.ERROR,
+                                             'Found corrupted data. Incident will be reported',
+                                             AlertTags.DANGER)
+                        return self.get(request)
+                    keys[candidate.id] = (True, keys[candidate.id][1])
+
+            for _, value in keys.items():
+                if not value[0]:
+                    messages.add_message(request, messages.ERROR,
+                                         'Found corrupted data. Incident will be reported',
+                                         AlertTags.DANGER)
+                    return self.get(request)
+
+            # create voes
+            vote_list = []
+            for key, value in keys.items():
+                vote = Vote(candidate_id=key)
+                vote_val = value[1]
+                if vote_val == 1:
+                    vote.yes = True
+                elif vote_val == -1:
+                    vote.no = True
+                else:
+                    vote.neutral = True
+
+                vote_list.append(vote)
+
+            # Add vote to server
+            with transaction.atomic():
+                Vote.objects.bulk_create(vote_list)
+                voter.voted = True
+                voter.save()
+
+            messages.add_message(request, messages.INFO, 'Your vote has been recorded', AlertTags.SUCCESS)
+            return self.get(request, vote_added=True)
+        else:
+            messages.add_message(request, messages.INFO,
+                                 'Recieved corrupted data. Incident is recorded',
+                                 AlertTags.DANGER)
+            return self.get(request)
