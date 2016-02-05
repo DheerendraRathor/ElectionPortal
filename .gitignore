@@ -160,4 +160,8 @@ crashlytics-build.properties
 
 ## Custom
 db.sqlite3
+media/*
+staticfiles/
+
+!.gitkeep
 

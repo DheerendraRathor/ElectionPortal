@@ -3,19 +3,24 @@ import csv
 from django.conf.urls import url
 from django.contrib import admin
 from django.http.response import HttpResponse
-
-from post.models import Post
-from .models import Election, Voter, Tag
-from .forms import NonSuperuserElectionForm
-from .views import AddVotersView, ElectionResultView
 from simple_history.admin import SimpleHistoryAdmin
-from post.utils import PostUtils
+
 from core.admin import RemoveDeleteSelectedMixin
+from post.models import Post
+from post.utils import PostUtils
+from .forms import NonSuperuserElectionForm
+from .models import Election, Voter, Tag
+from .views import AddVotersView, ElectionResultView
 
 
 class PostInline(admin.TabularInline):
     model = Post
     extra = 0
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.order_by('order')
+        return qs
 
     def get_readonly_fields(self, request, obj=None):
         return PostUtils().get_post_read_only_fields(request, obj)

@@ -27,15 +27,15 @@
         var $session_alert_div = $("#session-alert");
         var session_in_danger = false;
 
-        var session_interval = window.setInterval(function(){
-            if (session_seconds < 60 && !session_in_danger){
+        var session_interval = window.setInterval(function () {
+            if (session_seconds < 60 && !session_in_danger) {
                 $session_alert_div.removeClass('alert-warning');
                 $session_alert_div.addClass('alert-danger');
                 $session_alert_div.addClass('blink');
                 session_in_danger = true;
             }
 
-            if (session_seconds <= 0){
+            if (session_seconds <= 0) {
                 clearInterval(session_interval);
                 window.location.reload();
             }
@@ -67,17 +67,16 @@
                             <h3 class="post-title">{{ post.name }} - {{ post.number }}</h3>
                             <div class="row candidate-list">
                                 {% for candidate in post.candidates.all %}
-                                    <div id="candidate-{{ candidate.id }}" class="candidate col-md-3">
+                                    <div id="candidate-{{ candidate.id }}" class="candidate col-sm-4 col-md-3">
                                         <div id="candidate-{{ candidate.id }}-poster"
                                              class="candidate-poster thumbnail"
                                              data-candidate="{{ candidate.id }}"
                                         >
-                                            <img src="
-                                        {% if candidate.image %}{{ candidate.image.url }}
-                                        {% else %}
-                                            {% static 'img/default_user.png' %}
-                                        {% endif %}
-                                        " alt="candidate image">
+                                            <img style="width: 100%; height: 250px; display: block;" src="
+                                                     {% if candidate.image %}{{ candidate.image.url }}{% else %}
+                                                     {% static 'img/default_user.png' %}{% endif %}"
+                                            >
+
                                             <div class="caption">
                                                 <h4>{{ candidate.name }}</h4>
                                                 <div class="radio">

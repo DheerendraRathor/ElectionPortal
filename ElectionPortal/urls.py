@@ -13,14 +13,18 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
+import re
+
+from django.conf import settings
 from django.conf.urls import url, include
 from django.contrib import admin
-import post.urls
-from .admin_config import config as admin_config
+from django.views.static import serve
+
 import account.urls
 import election.urls
+import post.urls
+from .admin_config import config as admin_config
 from .views import IndexView
-
 
 admin_config()
 
@@ -31,4 +35,12 @@ urlpatterns = [
     url(r'^post/', include(post.urls, namespace='post')),
     url(r'^accounts/', include(account.urls, namespace='account')),
     url(r'^election/', include(election.urls, namespace='election')),
+]
+
+
+urlpatterns += [
+    url(r'^%s(?P<path>.*)$' % re.escape(settings.STATIC_URL.lstrip('/')), serve,
+        kwargs={'document_root': settings.STATIC_ROOT}),
+    url(r'^%s(?P<path>.*)$' % re.escape(settings.MEDIA_URL.lstrip('/')), serve,
+        kwargs={'document_root': settings.MEDIA_ROOT}),
 ]

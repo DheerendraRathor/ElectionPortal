@@ -124,6 +124,7 @@ class AddVotersView(TemplateView):
 
                     roll_number = roll_number.upper()
 
+                    # TODO: This is definitely not the best way. But Checking for uniqueness is a pain
                     voter, created = Voter.objects.get_or_create(roll_no=roll_number, election=self.object)
                     if created:
                         new_voters_added += 1
@@ -195,7 +196,10 @@ class ElectionView(LoginRequiredMixin, TemplateView):
             is_active=True, is_temporary_closed=False, is_finished=False,
             voters__roll_no__iexact=profile.roll_number, voters__voted=False
         ).prefetch_related(
-            'posts__candidates',
+            Prefetch(
+                'posts',
+                queryset=Post.objects.all().filter().order_by('order').prefetch_related('candidates'),
+            ),
             Prefetch('voters', queryset=Voter.objects.all().filter(roll_no__iexact=profile.roll_number),
                      to_attr='voter'),
         ).order_by('id').first()
@@ -301,6 +305,6 @@ class ElectionView(LoginRequiredMixin, TemplateView):
             return self.get(request, vote_added=True)
         else:
             messages.add_message(request, messages.INFO,
-                                 'Recieved corrupted data. Incident is recorded',
+                                 'Received corrupted data. Incident is recorded',
                                  AlertTags.DANGER)
             return self.get(request)

@@ -12,7 +12,7 @@ class CandidateInline(admin.TabularInline):
 
 @admin.register(Post)
 class PostAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
-    list_display = ['id', 'name', 'number', 'election', 'type']
+    list_display = ['id', 'name', 'number', 'election', 'type', 'order']
     inlines = [CandidateInline]
     list_filter = [ElectionsFilter]
 

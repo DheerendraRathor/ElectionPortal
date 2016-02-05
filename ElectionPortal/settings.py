@@ -52,6 +52,7 @@ AUTH_PROFILE_MODULE = 'account.UserProfile'
 
 AUTH_LDAP_PROFILE_ATTR_MAP = {
     'roll_number': 'employeeNumber',
+    'user_type': 'employeeType',
 }
 
 # Application definition
@@ -156,6 +157,12 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static/'),
 ]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+MEDIA_URL = '/media/'
 
 VOTER_SESSION_TIMEOUT = 180
 

@@ -1,4 +1,5 @@
 from django.db import models
+
 from election.models import Election
 
 
@@ -12,6 +13,7 @@ class Post(models.Model):
     number = models.IntegerField(default=1)
     election = models.ForeignKey(Election, related_name='posts', db_index=True)
     type = models.IntegerField(choices=POST_TYPE, default=0)
+    order = models.PositiveSmallIntegerField(default=0)
 
     def __str__(self):
         type_string = ''

@@ -13,7 +13,7 @@
 
 .election-vote-cast {
     margin-left: 20px;
-    padding: 20px 20px 20px 0;
+    padding: 20px 20px 20px 20px;
     background: lightcoral;
 }
 
@@ -58,4 +58,10 @@
 @keyframes blink {
     from { opacity:1; }
     to { opacity:0.4; }
+}
+
+.thumbnail-image {
+    position:relative;
+    overflow:hidden;
+    padding-bottom:100%;
 }
