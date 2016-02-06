@@ -2,6 +2,15 @@
 {% load i18n admin_urls %}
 {% block object-tools-items %}
     {% if opts.label_lower == 'election.election' %}
+        <li>
+            <a href="{% url 'election:preview' original.pk|admin_urlquote %}" class="historylink">
+                Preview Page
+            </a>
+            <ul>
+                <li><a href="{% url 'election:preview' original.pk|admin_urlquote 'ug' %}">as UG</a></li>
+                <li><a href="{% url 'election:preview' original.pk|admin_urlquote 'pg' %}">as PG</a></li>
+            </ul>
+        </li>
         {% if original.is_finished or request.user.is_superuser %}
             <li>
                 <a href="{% url opts|admin_urlname:'get_election_result' original.pk|admin_urlquote %}"
