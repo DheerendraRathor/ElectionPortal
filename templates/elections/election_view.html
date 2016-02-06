@@ -5,6 +5,7 @@
     {{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static 'css/abcheckbox.css' %}"/>
     <link rel="stylesheet" type="text/css" href="{% static 'css/elections/base.css' %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/center-col.css' %}"/>
 {% endblock %}
 
 {% block jsLinks %}
@@ -76,9 +77,9 @@
                                 <h3 class="post-title">{{ post.name }}</h3>
                                 <h4 class="post-title">Available Posts: {{ post.number }}</h4>
                             </div>
-                            <div class="row candidate-list">
+                            <div class="row row-centered candidate-list">
                                 {% for candidate in post.candidates.all %}
-                                    <div id="candidate-{{ candidate.id }}" class="candidate col-sm-4 col-md-3">
+                                    <div id="candidate-{{ candidate.id }}" class="candidate col-sm-4 col-md-3 col-centered">
                                         <div id="candidate-{{ candidate.id }}-poster"
                                              class="candidate-poster thumbnail"
                                              data-candidate="{{ candidate.id }}"
@@ -89,7 +90,7 @@
                                                      {% static 'img/default_user.png' %}{% endif %}"
                                             >
 
-                                            <div class="caption text-capitalize">
+                                            <div class="caption text-capitalize text-center">
                                                 <h4>{{ candidate.name }}</h4>
                                                 <div class="radio">
                                                     <input name="candidate-{{ candidate.id }}"
