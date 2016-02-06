@@ -161,7 +161,10 @@ crashlytics-build.properties
 ## Custom
 db.sqlite3
 media/*
+logs/*
 staticfiles/
+
+uwsgi.ini
 
 !.gitkeep
 
