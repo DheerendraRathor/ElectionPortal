@@ -26,12 +26,13 @@ class PostTypes(object):
     UG = 1
     PG = 2
 
+POST_TYPE_DICT = {
+    PostTypes.ALL: 'ALL',
+    PostTypes.UG: 'UG',
+    PostTypes.PG: 'PG',
+}
 
-POST_TYPE_CHOICES = [
-    (PostTypes.ALL, 'ALL'),
-    (PostTypes.UG, 'UG'),
-    (PostTypes.PG, 'PG'),
-]
+POST_TYPE_CHOICES = [(key, value) for key, value in POST_TYPE_DICT.items()]
 
 CAN_VOTE = ['UG', 'PG', 'DD']
 

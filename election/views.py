@@ -12,7 +12,7 @@ from django.http.response import Http404
 from django.views.generic.base import TemplateView
 
 from account.views import VoterLogoutView
-from core.core import IITB_ROLL_REGEX, AlertTags, PostTypes
+from core.core import IITB_ROLL_REGEX, AlertTags, PostTypes, POST_TYPE_DICT
 from post.models import Candidate, Post
 from vote.models import Vote
 
@@ -316,3 +316,38 @@ class ElectionView(LoginRequiredMixin, TemplateView):
                                  'Received corrupted data. Incident is recorded',
                                  AlertTags.DANGER)
             return self.get(request)
+
+
+class ElectionPreview(ElectionView):
+    template_name = 'elections/election_view.html'
+
+    def _get_next_election(self):
+        election_id = self.kwargs['pk']
+        view_as = self.kwargs.get('type', '').upper()
+
+        post_types = [PostTypes.ALL]
+        if view_as == POST_TYPE_DICT[PostTypes.UG]:
+            post_types.append(PostTypes.UG)
+        if view_as == POST_TYPE_DICT[PostTypes.PG]:
+            post_types.append(PostTypes.PG)
+
+        election = Election.objects.all().filter(pk=election_id).prefetch_related(
+            Prefetch(
+                'posts',
+                queryset=Post.objects.all().filter(type__in=post_types).order_by('order').prefetch_related('candidates'),
+            )
+        ).order_by('id')
+
+        if not self.request.user.is_superuser:
+            election = election.filter(creator=self.request.user)
+
+        election = election.first()
+
+        messages.add_message(self.request, messages.INFO, 'Election Preview', AlertTags.INFO)
+
+        self.election = election
+        return election
+
+    def post(self, request, *args, **kwargs):
+        messages.add_message(request, messages.ERROR, 'Cannot cast vote in election preview.', AlertTags.DANGER)
+        return self.get(request)

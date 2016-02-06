@@ -11,7 +11,7 @@ from post.models import Post
 from post.utils import PostUtils
 from .forms import NonSuperuserElectionForm
 from .models import Election, Voter, Tag
-from .views import AddVotersView, ElectionResultView
+from .views import AddVotersView, ElectionResultView, ElectionPreview
 
 
 class PostInline(admin.TabularInline):
