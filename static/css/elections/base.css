@@ -17,18 +17,16 @@
 }
 
 .election-vote-cast {
-    margin-left: 20px;
     padding: 20px 20px 20px 20px;
     background: lightcoral;
 }
 
 .post-list {
-    margin-left: 20px;
     background: beige;
 }
 
 .post {
-    padding: 5px 5px 5px 15px;
+    padding: 10px;
 }
 
 .post-title {
@@ -36,7 +34,7 @@
 }
 
 .candidate-list {
-    margin-left: 10px;
+
 }
 
 .election {

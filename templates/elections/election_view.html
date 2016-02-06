@@ -53,21 +53,29 @@
 
     <div class="row">
 
-        <div id="session-alert" class="alert alert-warning pull-right" data-spy="affix" data-offset-top="60">
-            <strong>Session expiring in: <span id="session-timeout">{{ session_timeout }}</span>s</strong>
-        </div>
-
         <div class="col-md-12 election">
             <div id="election-{{ election.id }}">
-                <h1 class="election-title">{{ election.name }}</h1>
+                <div class="row" style="overflow:auto; padding: 0 10px 0 10px;">
+                    <div class="col-md-9">
+                        <h1 class="election-title">{{ election.name }}</h1>
+                    </div>
+                    <div class="col-md-3 text-center">
+                        <div id="session-alert" class="alert alert-warning" data-spy="affix"
+                             data-smart-affix>
+                            <strong>Session expiring in: <span
+                                    id="session-timeout"> {{ session_timeout }}</span>s</strong>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="post-list">
 
                     {% for post in election.posts.all %}
                         <div class="post" id="post-{{ post.id }}" data-count="{{ post.number }}">
-                        <div class="text-center text-capitalize text-info">
-                            <h3 class="post-title">{{ post }}</h3>
-                            <h3 class="post-title">Available Posts: {{ post.number }}</h3>
-                        </div>
+                            <div class="text-center text-capitalize text-info">
+                                <h3 class="post-title">{{ post.name }}</h3>
+                                <h4 class="post-title">Available Posts: {{ post.number }}</h4>
+                            </div>
                             <div class="row candidate-list">
                                 {% for candidate in post.candidates.all %}
                                     <div id="candidate-{{ candidate.id }}" class="candidate col-sm-4 col-md-3">
@@ -75,7 +83,8 @@
                                              class="candidate-poster thumbnail"
                                              data-candidate="{{ candidate.id }}"
                                         >
-                                            <img class="img-circle img-thumbnail" style="width: 100%; height: 250px; display: block;" src="
+                                            <img class="img-circle img-thumbnail"
+                                                 style="width: 100%; height: 250px; display: block;" src="
                                                      {% if candidate.image %}{{ candidate.image.url }}{% else %}
                                                      {% static 'img/default_user.png' %}{% endif %}"
                                             >

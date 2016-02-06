@@ -59,6 +59,8 @@ AUTH_LDAP_PROFILE_ATTR_MAP = {
 # Application definition
 
 INSTALLED_APPS = [
+    'jet.dashboard',
+    'jet',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

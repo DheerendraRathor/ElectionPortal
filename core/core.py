@@ -1,5 +1,4 @@
 import re
-from enum import Enum
 
 _year_part = r'\d\d'
 _program_part = r'[0-9D]'

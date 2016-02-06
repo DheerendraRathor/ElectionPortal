@@ -15,14 +15,17 @@ Including another URLconf
 """
 import re
 
+import jet.dashboard.urls
+import jet.urls
 from django.conf import settings
-from django.conf.urls import url, include
+from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.static import serve
 
 import account.urls
 import election.urls
 import post.urls
+
 from .admin_config import config as admin_config
 from .views import IndexView
 
@@ -30,6 +33,8 @@ admin_config()
 
 
 urlpatterns = [
+    url(r'^jet/', include(jet.urls, 'jet')),
+    url(r'^jet/dashboard/', include(jet.dashboard.urls, 'jet-dashboard')),
     url(r'^admin/', admin.site.urls),
     url(r'^$', IndexView.as_view(), name='index'),
     url(r'^post/', include(post.urls, namespace='post')),

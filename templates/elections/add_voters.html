@@ -40,21 +40,25 @@
                         <p class="help">Column in CSV which contains roll number. <b>Counting starts with 0.</b></p>
                     </div>
                     <div class="form-row field-tags">
-                        <label class="required" for="tags">Tags</label>
+                        <label for="tags">Tags</label>
                         {{ tags_related }}
                         <p class="help">Tag voters. Keep simple tags like 'hostel9', 'h_15_wing_a' etc. Use Ctrl + Click
-                            to select multiple. <b style="color: red;">Maximum 5 tags are allowed</b> </p>
+                            to select multiple. <b style="color: red;">Maximum 5 tags are allowed</b></p>
                     </div>
                     <div class="form-row field-roll_col">
-                        <label class="required" for="skip_one_row">Skip First Row?</label>
-                        <input class="vCheckboxField" name="skip_one_row" id="skip_one_row" type="checkbox"/>
-                        <p class="help">Check it if first row contains headers only</p>
+                        <div class="checkbox-row">
+                            <input class="vCheckboxField" name="skip_one_row" id="skip_one_row" type="checkbox"/>
+                            <label class="vCheckboxLabel" for="skip_one_row">Skip First Row?</label>
+                            <p class="help">Check it if first row contains headers only</p>
+                        </div>
                     </div>
                     <div class="form-row field-roll_col">
-                        <label class="required" for="skip_errors">Skip Errors Silently?</label>
-                        <input class="vCheckboxField" name="skip_errors" id="skip_errors" type="checkbox"/>
-                        <p class="help">Check it if you want to skip errors on invalid data. By default it will throw
-                            error on invalid data</p>
+                        <div class="checkbox-row">
+                            <input class="vCheckboxField" name="skip_errors" id="skip_errors" type="checkbox"/>
+                            <label class="vCheckboxLabel" for="skip_errors">Skip Errors Silently?</label>
+                            <p class="help">Check it if you want to skip errors on invalid data. By default it will
+                                throw error on invalid data</p>
+                        </div>
                     </div>
                 </fieldset>
                 <div class="submit-row" style="text-align: inherit">

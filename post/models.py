@@ -1,6 +1,6 @@
 from django.db import models
 
-from core.core import POST_TYPE_CHOICES
+from core.core import PostTypes, POST_TYPE_CHOICES
 from election.models import Election
 
 
@@ -13,9 +13,9 @@ class Post(models.Model):
 
     def __str__(self):
         type_string = ''
-        if self.type == 1:
+        if self.type == PostTypes.UG:
             type_string = ' [UG]'
-        elif self.type == 2:
+        elif self.type == PostTypes.PG:
             type_string = ' [PG]'
         return self.name + type_string
 
