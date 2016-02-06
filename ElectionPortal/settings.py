@@ -168,6 +168,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MEDIA_URL = '/media/'
 
-VOTER_SESSION_TIMEOUT = 18000
+VOTER_SESSION_TIMEOUT = 180
 
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'

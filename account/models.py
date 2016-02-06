@@ -20,3 +20,6 @@ class UserProfile(models.Model):
     @property
     def is_pg(self):
         return self.user_type.upper() in PG_TYPE
+
+    def __str__(self):
+        return self.roll_number
