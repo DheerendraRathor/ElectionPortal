@@ -6,6 +6,7 @@ from django.http.response import HttpResponse
 from simple_history.admin import SimpleHistoryAdmin
 
 from core.admin import RemoveDeleteSelectedMixin
+from core.admin_filters import ElectionsFilter
 from post.models import Post
 from post.utils import PostUtils
 from .forms import NonSuperuserElectionForm
@@ -21,6 +22,12 @@ class PostInline(admin.TabularInline):
         qs = super().get_queryset(request)
         qs = qs.order_by('order')
         return qs
+
+    def get_max_num(self, request, obj=None, **kwargs):
+        if not obj or request.user.is_superuser:
+            return super().get_max_num(request, obj, **kwargs)
+        if obj.creator != request.user or obj.has_activated:
+            return 0
 
     def get_readonly_fields(self, request, obj=None):
         return PostUtils().get_post_read_only_fields(request, obj)
@@ -127,7 +134,7 @@ class ElectionAdmin(RemoveDeleteSelectedMixin, SimpleHistoryAdmin):
 @admin.register(Voter)
 class VoterAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
     list_display = ['roll_no', 'created_at', 'election']
-    list_filter = ['election', 'tags']
+    list_filter = [ElectionsFilter, 'tags']
     search_fields = ['roll_no']
     actions = ['download_voters_action']
 
@@ -176,7 +183,7 @@ class VoterAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
 
 
 @admin.register(Tag)
-class TagAdmin(admin.ModelAdmin):
+class TagAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
     list_display = ['tag', 'created_by']
     search_fields = ['tag']
 

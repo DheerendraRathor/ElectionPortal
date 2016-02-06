@@ -9,16 +9,39 @@ class CandidateInline(admin.TabularInline):
     model = Candidate
     extra = 0
 
+    def get_max_num(self, request, obj=None, **kwargs):
+        if not obj or request.user.is_superuser:
+            return super().get_max_num(request, obj, **kwargs)
+        if obj.election.has_activated:
+            return 0
+
+    def get_readonly_fields(self, request, obj=None):
+        if not obj or request.user.is_superuser:
+            return []
+        if obj.election != request.user or obj.election.has_activated:
+            return ['name', 'image']
+        return []
+
+    def has_delete_permission(self, request, obj=None):
+        if not obj or request.user.is_superuser:
+            return True
+        return not obj.election.has_activated and obj.election.creator == request.user
+
 
 @admin.register(Post)
 class PostAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
-    list_display = ['name', 'number', 'election', 'type', 'order']
+    list_display = ['name', 'number', 'election', 'type']
     inlines = [CandidateInline]
     list_filter = [ElectionsFilter]
 
+    def get_readonly_fields(self, request, obj=None):
+        if not obj or request.user.is_superuser:
+            return []
+        return ['name', 'number', 'election', 'type', 'order']
+
     def formfield_for_foreignkey(self, db_field, request=None, **kwargs):
         if not request.user.is_superuser and db_field.name == 'election':
-            kwargs['queryset'] = Election.objects.all().filter(creator=request.user, is_finished=False)
+            kwargs['queryset'] = Election.objects.all().filter(creator=request.user, is_active=False, is_finished=False)
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_queryset(self, request):
@@ -30,8 +53,6 @@ class PostAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
     def has_change_permission(self, request, obj=None):
         if not obj or request.user.is_superuser:
             return True
-        if obj.election.has_activated:
-            return False
         return obj.election.creator == request.user
 
     def has_delete_permission(self, request, obj=None):
