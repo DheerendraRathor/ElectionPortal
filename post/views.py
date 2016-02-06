@@ -1,5 +1,6 @@
-from django.views.generic import View
 from django.http.response import HttpResponse
+from django.views.generic import View
+
 from .models import Candidate
 
 
@@ -13,4 +14,3 @@ class CandidateView(View):
             candid_list.append('Candidate: %s, Post: %s, Election %s' % (candidate.name, candidate.post.name,
                                candidate.post.election.name))
         return HttpResponse('\n'.join(candid_list), content_type='text/html')
-

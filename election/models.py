@@ -1,8 +1,9 @@
-from django.db import models
+from random import randint
+
 from django.contrib.auth.models import User
+from django.db import models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
-from random import randint
 
 
 class Election(models.Model):
@@ -69,5 +70,3 @@ class Voter(models.Model):
 
     def __str__(self):
         return self.roll_no
-
-

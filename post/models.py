@@ -1,6 +1,6 @@
 from django.db import models
 
-from core.core import PostTypes, POST_TYPE_CHOICES
+from core.core import POST_TYPE_CHOICES, PostTypes
 from election.models import Election
 
 

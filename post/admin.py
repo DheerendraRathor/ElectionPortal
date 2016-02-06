@@ -1,8 +1,10 @@
 from django.contrib import admin
-from .models import Post, Candidate
-from election.models import Election
+
 from core.admin import RemoveDeleteSelectedMixin
 from core.admin_filters import ElectionsFilter
+from election.models import Election
+
+from .models import Candidate, Post
 
 
 class CandidateInline(admin.TabularInline):

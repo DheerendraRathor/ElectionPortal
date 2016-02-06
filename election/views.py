@@ -12,7 +12,7 @@ from django.http.response import Http404
 from django.views.generic.base import TemplateView
 
 from account.views import VoterLogoutView
-from core.core import IITB_ROLL_REGEX, AlertTags, PostTypes, POST_TYPE_DICT
+from core.core import IITB_ROLL_REGEX, POST_TYPE_DICT, AlertTags, PostTypes
 from post.models import Candidate, Post
 from vote.models import Vote
 

@@ -1,4 +1,5 @@
 from django.contrib.admin.filters import SimpleListFilter
+
 from election.models import Election
 
 

@@ -1,7 +1,7 @@
 from django.conf.urls import url
-from .views import ElectionView, ElectionPreview
 from django.contrib.admin import site
 
+from .views import ElectionPreview, ElectionView
 
 ElectionPreviewView = site.admin_view(ElectionPreview.as_view())
 

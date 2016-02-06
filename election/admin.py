@@ -9,9 +9,10 @@ from core.admin import RemoveDeleteSelectedMixin
 from core.admin_filters import ElectionsFilter
 from post.models import Post
 from post.utils import PostUtils
+
 from .forms import NonSuperuserElectionForm
-from .models import Election, Voter, Tag
-from .views import AddVotersView, ElectionResultView, ElectionPreview
+from .models import Election, Tag, Voter
+from .views import AddVotersView, ElectionPreview, ElectionResultView
 
 
 class PostInline(admin.TabularInline):
