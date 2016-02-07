@@ -12,7 +12,7 @@ from django.http.response import Http404
 from django.views.generic.base import TemplateView
 
 from account.views import VoterLogoutView
-from core.core import IITB_ROLL_REGEX, POST_TYPE_DICT, AlertTags, PostTypes
+from core.core import IITB_ROLL_REGEX, POST_TYPE_DICT, AlertTags, PostTypes, VoteTypes
 from post.models import Candidate, Post
 from vote.models import Vote
 
@@ -268,12 +268,17 @@ class ElectionView(LoginRequiredMixin, TemplateView):
                                          AlertTags.DANGER)
                     return self.get(request)
 
+            # Validate votes
             votes = serialized_data.validated_data['votes']
             keys = dict()
             for key, value in votes.items():
                 keys[key] = (False, value)
 
+            # Checks that there is a vote for all candidate in election that are visible to voter
+            # Like it checks for posts for which voter should be allowed to vote
+            # It also checks if number of non-neutral votes for a post are less then total posts.
             for post in election.posts.all():
+                non_neutral_votes = 0
                 for candidate in post.candidates.all():
                     if candidate.id not in keys:
                         messages.add_message(request, messages.ERROR,
@@ -281,7 +286,17 @@ class ElectionView(LoginRequiredMixin, TemplateView):
                                              AlertTags.DANGER)
                         return self.get(request)
                     keys[candidate.id] = (True, keys[candidate.id][1])
+                    if keys[candidate.id][1] != VoteTypes.NEUTRAL:
+                        non_neutral_votes += 1
 
+                if non_neutral_votes > post.number:
+                    messages.add_message(request, messages.ERROR,
+                                         'Found invalid data. Attempt is logged',
+                                         AlertTags.DANGER)
+                    return self.get(request)
+
+            # Check if there is an entry present which are not pk for candidates in election available
+            # To person
             for _, value in keys.items():
                 if not value[0]:
                     messages.add_message(request, messages.ERROR,

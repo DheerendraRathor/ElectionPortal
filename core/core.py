@@ -39,3 +39,17 @@ CAN_VOTE = ['UG', 'PG', 'DD']
 UG_TYPE = ['UG', 'DD']
 
 PG_TYPE = ['PG']
+
+
+class VoteTypes(object):
+    YES = 1
+    NO = -1
+    NEUTRAL = 0
+
+VOTE_TYPE_DICT = {
+    VoteTypes.YES: 'Yes',
+    VoteTypes.NO: 'No',
+    VoteTypes.NEUTRAL: 'Neutral',
+}
+
+VOTE_TYPE_CHOICES = [(key, value) for key, value in VOTE_TYPE_DICT.items()]
