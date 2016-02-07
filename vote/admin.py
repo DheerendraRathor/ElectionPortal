@@ -1,13 +1,15 @@
 from django.contrib import admin
 
+from core.admin import RemoveDeleteSelectedMixin
 from .models import Vote
 
 
 @admin.register(Vote)
-class VoteAdmin(admin.ModelAdmin):
+class VoteAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
     list_display = ['id', 'candidate', 'yes', 'no', 'neutral']
     list_display_links = None
-    readonly_fields = Vote._meta.get_all_field_names()
+    list_filter = ['candidate__post__election']
+    readonly_fields = ['candidate', 'yes', 'no', 'neutral', 'casted_at']
 
     def get_queryset(self, request):
         qs = Vote.objects.all().order_by('-casted_at')
