@@ -153,7 +153,6 @@ class ElectionResultView(TemplateView):
             raise Http404
         queryset = Election.objects.all().annotate(
             total_voters=Count('voters'),
-            votes_casted=Sum(Case(When(voters__voted=True, then=1), default=0, output_field=IntegerField()))
         ).filter(pk=args[0])
 
         if not request.user.is_superuser:
@@ -176,10 +175,12 @@ class ElectionResultView(TemplateView):
         posts = Post.objects.all().filter(election=self.object).prefetch_related(
             Prefetch('candidates',
                      queryset=Candidate.objects.all().annotate(
-                         yes_votes=Sum(Case(When(votes__yes=True, then=1), default=0, output_field=IntegerField())),
-                         no_votes=Sum(Case(When(votes__no=True, then=1), default=0, output_field=IntegerField())),
+                         yes_votes=Sum(
+                             Case(When(votes__vote=VoteTypes.YES, then=1), default=0, output_field=IntegerField())),
+                         no_votes=Sum(
+                             Case(When(votes__vote=VoteTypes.NO, then=1), default=0, output_field=IntegerField())),
                          neutral_votes=Sum(
-                             Case(When(votes__neutral=True, then=1), default=0, output_field=IntegerField())),
+                             Case(When(votes__vote=VoteTypes.NEUTRAL, then=1), default=0, output_field=IntegerField())),
                      ))
         )
 
@@ -206,7 +207,8 @@ class ElectionView(LoginRequiredMixin, TemplateView):
         ).prefetch_related(
             Prefetch(
                 'posts',
-                queryset=Post.objects.all().filter(type__in=post_types).order_by('order').prefetch_related('candidates'),
+                queryset=Post.objects.all().filter(type__in=post_types).order_by('order').prefetch_related(
+                    'candidates'),
             ),
             Prefetch('voters', queryset=Voter.objects.all().filter(roll_no__iexact=profile.roll_number),
                      to_attr='voter'),
@@ -237,7 +239,6 @@ class ElectionView(LoginRequiredMixin, TemplateView):
         return super().get(request, *args, **kwargs)
 
     # TODO: Log errors
-    # Todo: Add UG PG validation
     def post(self, request):
 
         serialized_data = AddVoteSerializer(data=request.body)
@@ -275,7 +276,7 @@ class ElectionView(LoginRequiredMixin, TemplateView):
                 keys[key] = (False, value)
 
             # Checks that there is a vote for all candidate in election that are visible to voter
-            # Like it checks for posts for which voter should be allowed to vote
+            # Like it checks for posts for which voter should be allowed to vote (UG/PG)
             # It also checks if number of non-neutral votes for a post are less then total posts.
             for post in election.posts.all():
                 non_neutral_votes = 0
@@ -308,14 +309,7 @@ class ElectionView(LoginRequiredMixin, TemplateView):
             vote_list = []
             for key, value in keys.items():
                 vote = Vote(candidate_id=key)
-                vote_val = value[1]
-                if vote_val == 1:
-                    vote.yes = True
-                elif vote_val == -1:
-                    vote.no = True
-                else:
-                    vote.neutral = True
-
+                vote.vote = value[1]
                 vote_list.append(vote)
 
             # Add vote to server
@@ -349,7 +343,8 @@ class ElectionPreview(ElectionView):
         election = Election.objects.all().filter(pk=election_id).prefetch_related(
             Prefetch(
                 'posts',
-                queryset=Post.objects.all().filter(type__in=post_types).order_by('order').prefetch_related('candidates'),
+                queryset=Post.objects.all().filter(type__in=post_types).order_by('order').prefetch_related(
+                    'candidates'),
             )
         ).order_by('id')
 

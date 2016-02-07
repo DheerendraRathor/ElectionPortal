@@ -6,10 +6,10 @@ from .models import Vote
 
 @admin.register(Vote)
 class VoteAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
-    list_display = ['id', 'candidate', 'yes', 'no', 'neutral']
+    list_display = ['id', 'candidate', 'vote']
     list_display_links = None
     list_filter = ['candidate__post__election']
-    readonly_fields = ['candidate', 'yes', 'no', 'neutral', 'casted_at']
+    readonly_fields = ['candidate', 'vote', 'casted_at']
 
     def get_queryset(self, request):
         qs = Vote.objects.all().order_by('-casted_at')
