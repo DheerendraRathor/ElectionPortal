@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from core.core import CAN_VOTE, PG_TYPE, UG_TYPE, EXTENDED_UG_REGEX, VoterTypes
+from core.core import CAN_VOTE, EXTENDED_UG_REGEX, PG_TYPE, UG_TYPE, VoterTypes
 
 
 class UserProfile(models.Model):

@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from core.admin import RemoveDeleteSelectedMixin
+
 from .models import Vote
 
 

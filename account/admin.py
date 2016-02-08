@@ -5,4 +5,4 @@ from .models import UserProfile
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ['user', 'roll_number', 'user_type']
+    list_display = ['user', 'roll_number', 'voter_type', 'user_type']
