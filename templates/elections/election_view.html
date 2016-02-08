@@ -78,7 +78,7 @@
                     {% for post in election.posts.all %}
                         <div class="post" id="post-{{ post.id }}" data-count="{{ post.number }}">
                             <div class="text-center text-capitalize text-info">
-                                <h3 class="post-title">{{ post.name }}</h3>
+                                <h2 class="post-title">{{ post.name }}</h2>
                                 <h4 class="post-title">Available Posts: {{ post.number }}</h4>
                             </div>
                             <div class="row row-centered candidate-list">
