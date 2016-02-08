@@ -1,5 +1,6 @@
 import codecs
 import csv
+from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.admin import site
@@ -12,7 +13,7 @@ from django.http.response import Http404
 from django.views.generic.base import TemplateView
 
 from account.views import VoterLogoutView
-from core.core import IITB_ROLL_REGEX, POST_TYPE_DICT, AlertTags, PostTypes, VoteTypes
+from core.core import IITB_ROLL_REGEX, LOGGED_IN_SESSION_KEY, POST_TYPE_DICT, AlertTags, PostTypes, VoteTypes
 from post.models import Candidate, Post
 from vote.models import Vote
 
@@ -220,6 +221,11 @@ class ElectionView(LoginRequiredMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         election = self._get_next_election()
 
+        # Checked if it is landing page after logging in
+        logged_in = LOGGED_IN_SESSION_KEY in request.session
+        if logged_in:
+            del request.session[LOGGED_IN_SESSION_KEY]
+
         if not election:
             messages.add_message(request, messages.INFO,
                                  'No election available for you now',
@@ -227,10 +233,10 @@ class ElectionView(LoginRequiredMixin, TemplateView):
             request.method = 'POST'
             return VoterLogoutView.as_view()(request)
 
-        vote_added = kwargs.pop('vote_added', False)
-        if vote_added:
+        new_session = kwargs.pop('new_session', False)
+        if new_session or logged_in:
             # Uncomment following line to extend session for each election
-            # request.session.set_expiry(timedelta(seconds=settings.VOTER_SESSION_TIMEOUT))
+            request.session.set_expiry(timedelta(seconds=election.session_timeout))
             pass
 
         kwargs['election'] = election
@@ -319,7 +325,7 @@ class ElectionView(LoginRequiredMixin, TemplateView):
                 voter.save()
 
             messages.add_message(request, messages.INFO, 'Your vote has been recorded', AlertTags.SUCCESS)
-            return self.get(request, vote_added=True)
+            return self.get(request, new_session=True)
         else:
             messages.add_message(request, messages.INFO,
                                  'Received corrupted data. Incident is recorded',

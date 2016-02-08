@@ -16,6 +16,8 @@ class Election(models.Model):
     is_finished = models.BooleanField(default=False, db_index=True)
     finished_at = models.DateTimeField(blank=True, null=True)
     is_key_required = models.BooleanField(default=True)
+    session_timeout = models.PositiveSmallIntegerField(default=120,
+                                                       help_text='Seconds after which session will be timed out')
     _history_ = HistoricalRecords()
 
     @property

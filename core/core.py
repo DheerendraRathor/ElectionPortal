@@ -11,8 +11,17 @@ IITB_ROLL_REGEX = re.compile(r'^' +
                              _department_part +
                              _sequential_part +
                              r'$',
-                             re.IGNORECASE
+                             re.IGNORECASE,
                              )
+
+EXTENDED_UG_REGEX = re.compile(r'^' +
+                               _year_part +
+                               r'[5ik]' +
+                               _department_part +
+                               _sequential_part +
+                               r'$',
+                               re.IGNORECASE,
+                               )
 
 
 class AlertTags(object):
@@ -41,6 +50,11 @@ UG_TYPE = ['UG', 'DD']
 PG_TYPE = ['PG']
 
 
+class VoterTypes(object):
+    UG = 'UG'
+    PG = 'PG'
+
+
 class VoteTypes(object):
     YES = 1
     NO = -1
@@ -53,3 +67,5 @@ VOTE_TYPE_DICT = {
 }
 
 VOTE_TYPE_CHOICES = [(key, value) for key, value in VOTE_TYPE_DICT.items()]
+
+LOGGED_IN_SESSION_KEY = 'LOGGED_IN'

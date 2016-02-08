@@ -1,11 +1,9 @@
-from datetime import timedelta
 
-from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import redirect, render
 from django.views.generic.edit import FormView, View
 
-from core.core import CAN_VOTE
+from core.core import CAN_VOTE, LOGGED_IN_SESSION_KEY
 from election.models import Voter
 
 from .forms import VoterLoginForm
@@ -43,7 +41,7 @@ class VoterLoginView(FormView):
                 )
                 if not is_valid_voter:
                     form.add_error(None, 'User is not a valid voter')
-                request.session.set_expiry(timedelta(seconds=settings.VOTER_SESSION_TIMEOUT))
+                request.session[LOGGED_IN_SESSION_KEY] = True
                 login(request, user)
                 return redirect(next_)
             else:

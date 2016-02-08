@@ -6,7 +6,7 @@ from .models import Vote
 
 @admin.register(Vote)
 class VoteAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
-    list_display = ['id', 'candidate', 'vote']
+    list_display = ['id', 'candidate', 'vote', 'casted_at']
     list_display_links = None
     list_filter = ['candidate__post__election']
     readonly_fields = ['candidate', 'vote', 'casted_at']
