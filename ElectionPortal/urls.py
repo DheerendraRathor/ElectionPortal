@@ -33,7 +33,6 @@ admin_config()
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^$', IndexView.as_view(), name='index'),
-    url(r'^post/', include(post.urls, namespace='post')),
     url(r'^accounts/', include(account.urls, namespace='account')),
     url(r'^election/', include(election.urls, namespace='election')),
 ]
