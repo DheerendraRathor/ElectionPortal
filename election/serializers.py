@@ -9,7 +9,7 @@ from core.core import VOTE_TYPE_DICT
 class AddVoteSerializer(serializers.Serializer):
     election = serializers.IntegerField()
     votes = serializers.JSONField(binary=True)
-    key = serializers.IntegerField(default=None)
+    key = serializers.CharField(default=None)
 
     def to_internal_value(self, form_data):
         stream = BytesIO(form_data)

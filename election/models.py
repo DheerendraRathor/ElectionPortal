@@ -70,7 +70,7 @@ class Voter(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        if self.pk is None and self.voted:
+        if not self.voted_at and self.voted:
             self.voted_at = timezone.now()
         return super().save(force_insert=force_insert, force_update=force_update, using=using,
                             update_fields=update_fields)
