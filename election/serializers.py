@@ -7,7 +7,6 @@ from core.core import VOTE_TYPE_DICT
 
 
 class AddVoteSerializer(serializers.Serializer):
-    election = serializers.IntegerField()
     votes = serializers.JSONField(binary=True)
     key = serializers.CharField(default=None)
 

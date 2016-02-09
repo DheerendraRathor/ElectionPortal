@@ -146,7 +146,6 @@
                 <div class="election-vote-cast center-block text-center">
                     <form method="post" id="submit-vote" data-election="{{ election.id }}">
                         {% csrf_token %}
-                        <input type="hidden" name="election" value="{{ election.id }}"/>
                         <input type="hidden" name="votes" id="submit-form-votes-inp"/>
                         {% if election.is_key_required %}
                             <div class="form-group col-xs-9">
