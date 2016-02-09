@@ -23,6 +23,7 @@ class NonSuperuserElectionForm(forms.ModelForm):
 class PostInline(admin.TabularInline):
     model = Post
     extra = 0
+    show_change_link = True
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)

@@ -26,9 +26,9 @@ def auto_delete_file_on_delete(sender, instance, **kwargs):
     """Deletes file from filesystem
     when corresponding `MediaFile` object is deleted.
     """
-    if instance.file:
-        if os.path.isfile(instance.file.path):
-            os.remove(instance.file.path)
+    if instance.image:
+        if os.path.isfile(instance.image.path):
+            os.remove(instance.image.path)
 
 
 @receiver(models.signals.pre_save, sender=Candidate)
@@ -40,11 +40,11 @@ def auto_delete_file_on_change(sender, instance, **kwargs):
         return False
 
     try:
-        old_file = Candidate.objects.get(pk=instance.pk).file
+        old_image = Candidate.objects.get(pk=instance.pk).image
     except Candidate.DoesNotExist:
         return False
 
-    new_file = instance.file
-    if not old_file == new_file:
-        if os.path.isfile(old_file.path):
-            os.remove(old_file.path)
+    new_image = instance.image
+    if not old_image == new_image:
+        if os.path.isfile(old_image.path):
+            os.remove(old_image.path)
