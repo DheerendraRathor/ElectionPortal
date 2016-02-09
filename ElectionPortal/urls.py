@@ -22,7 +22,6 @@ from django.views.static import serve
 
 import account.urls
 import election.urls
-import post.urls
 
 from .admin_config import config as admin_config
 from .views import IndexView

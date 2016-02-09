@@ -18,12 +18,3 @@ class Post(models.Model):
         elif self.type == PostTypes.PG:
             type_string = ' [PG]'
         return self.name + type_string
-
-
-class Candidate(models.Model):
-    name = models.CharField(max_length=64, db_index=True)
-    image = models.ImageField(null=True, blank=True)
-    post = models.ForeignKey(Post, related_name='candidates', db_index=True)
-
-    def __str__(self):
-        return self.name
