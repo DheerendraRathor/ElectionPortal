@@ -68,6 +68,10 @@ class Voter(models.Model):
     class Meta:
         unique_together = ['roll_no', 'election']
 
+    def shuffle_key(self):
+        self.key = generate_random_voter_key()
+        return self.save()
+
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
         if not self.voted_at and self.voted:

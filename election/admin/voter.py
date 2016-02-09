@@ -2,11 +2,13 @@ import csv
 
 from django.contrib import admin
 from django.http.response import HttpResponse
+from django.db import transaction
 
 from core.admin import RemoveDeleteSelectedMixin
 from core.admin_filters import ElectionsFilter
 
 from ..models import Election, Voter
+from django.contrib import messages
 
 
 @admin.register(Voter)
@@ -34,6 +36,13 @@ class VoterAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
 
     download_voters_action.short_description = 'Download voters data'
 
+    def shuffle_voters_keys(self, request, queryset):
+        with transaction.atomic():
+            for voter in queryset:
+                voter.shuffle_key()
+        messages.add_message(request, messages.SUCCESS, 'Voters keys shuffled successfully')
+
+    shuffle_voters_keys.short_description = 'Shuffle voters keys'
 
     def get_fields(self, request, obj=None):
         fields = super().get_fields(request, obj)
