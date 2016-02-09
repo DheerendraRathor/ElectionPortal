@@ -14,7 +14,7 @@ class VoterAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
     list_display = ['roll_no', 'created_at', 'election']
     list_filter = [ElectionsFilter, 'tags']
     search_fields = ['roll_no']
-    actions = ['download_voters_action']
+    actions = ['download_voters_action', 'shuffle_voters_keys']
 
     def download_voters_action(self, request, queryset):
         response = HttpResponse(content_type='text/csv')
@@ -33,6 +33,7 @@ class VoterAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
         return response
 
     download_voters_action.short_description = 'Download voters data'
+
 
     def get_fields(self, request, obj=None):
         fields = super().get_fields(request, obj)

@@ -1,9 +1,11 @@
-from random import randint
+import random
 
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
+from django.core.validators import MaxValueValidator
+from django.conf import settings
 
 
 class Election(models.Model):
@@ -17,6 +19,9 @@ class Election(models.Model):
     finished_at = models.DateTimeField(blank=True, null=True)
     is_key_required = models.BooleanField(default=True)
     session_timeout = models.PositiveSmallIntegerField(default=120,
+                                                       validators=[
+                                                            MaxValueValidator(600),
+                                                        ],
                                                        help_text='Seconds after which session will be timed out')
     _history_ = HistoricalRecords()
 
@@ -48,14 +53,14 @@ class Tag(models.Model):
 
 
 def generate_random_voter_key():
-    return randint(10000, 99999)
+    return ''.join(random.choice('0123456789ABCDEF') for _ in range(settings.VOTER_KEY_LENGTH))
 
 
 class Voter(models.Model):
     roll_no = models.CharField(max_length=10, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     election = models.ForeignKey(Election, related_name='voters', db_index=True)
-    key = models.IntegerField(default=generate_random_voter_key)
+    key = models.CharField(max_length=settings.VOTER_KEY_LENGTH, default=generate_random_voter_key)
     voted = models.BooleanField(default=False, db_index=True)
     voted_at = models.DateTimeField(null=True, blank=True)
     tags = models.ManyToManyField(Tag, blank=True)

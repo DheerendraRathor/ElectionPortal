@@ -5,8 +5,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
-# Session timeout for voter
-VOTER_SESSION_TIMEOUT = 180
+# Voter Key Length
+VOTER_KEY_LENGTH = 6
 
 # Email server settings
 EMAIL_HOST = "smtp-auth.iitb.ac.in"
