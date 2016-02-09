@@ -179,10 +179,14 @@ LOGGING = {
     'formatters': {
         'verbose': {
             'format': '%(levelname)s [%(asctime)s] [%(name)s] [%(module)s] [Process:%(process)d] '
-                      '[Thread:%(thread)d] %(message)s'
+                      '[Thread:%(thread)d] %(message)s',
+        },
+        'election_view': {
+            'format': '[%(asctime)s]  [%(client_ip)s]  [%(user)s] [%(election)s] [%(message)s]\n\n%(body)s\n'
+            '-----------------------------------------------------------------\n',
         },
         'simple': {
-            'format': '%(levelname)s %(message)s'
+            'format': '%(levelname)s %(message)s',
         },
     },
     'handlers': {
@@ -203,6 +207,12 @@ LOGGING = {
             'filename': os.path.join(BASE_DIR, 'logs/application.log'),
             'formatter': 'verbose',
         },
+        'election_view': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/election_view.log'),
+            'formatter': 'election_view',
+        },
         'mail_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler'
@@ -212,6 +222,11 @@ LOGGING = {
         '': {
             'handlers': ['file_application'],
             'level': 'INFO',
+        },
+        'election': {
+            'handlers': ['election_view'],
+            'level': 'ERROR',
+            'propagate': False,
         },
         'requests': {
             'handlers': ['file_application'],

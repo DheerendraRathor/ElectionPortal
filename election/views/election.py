@@ -9,11 +9,11 @@ from django.views.generic.base import TemplateView
 
 from account.views import VoterLogoutView
 from core.core import LOGGED_IN_SESSION_KEY, AlertTags, PostTypes, VoteTypes
+from core.security import get_client_ip
 from post.models import Post
 from vote.models import Vote
 from ..models import Election, Voter
 from ..serializers import AddVoteSerializer
-
 
 logger = logging.getLogger(__name__)
 
@@ -74,8 +74,14 @@ class ElectionView(LoginRequiredMixin, TemplateView):
 
         return super().get(request, *args, **kwargs)
 
-    # TODO: Log errors
     def post(self, request):
+
+        logging_dict = {
+            'client_ip': get_client_ip(request),
+            'user': request.user,
+            'body': request.body[:1024],
+            'election': '-1',
+        }
 
         serialized_data = AddVoteSerializer(data=request.body)
 
@@ -83,15 +89,19 @@ class ElectionView(LoginRequiredMixin, TemplateView):
             election = self._get_next_election()
 
             if not election:
+                logger.error('User has not valid election left', extra=logging_dict)
                 messages.add_message(request, messages.ERROR,
                                      'You\'ve no active election. This incident is logged',
                                      AlertTags.DANGER)
                 return self.get(request)
 
+            logging_dict['election'] = election.id
+
             # Validate is valid voter
             voters = election.voter
             voter = voters[0]
             if len(voters) != 1:
+                logger.error('User is not a valid voter', extra=logging_dict)
                 messages.add_message(request, messages.ERROR,
                                      'You\'re not a voter.',
                                      AlertTags.DANGER)
@@ -100,6 +110,7 @@ class ElectionView(LoginRequiredMixin, TemplateView):
             # Validate key
             if election.is_key_required:
                 if serialized_data.validated_data['key'] != voter.key:
+                    logger.error('User has entered invalid key', extra=logging_dict)
                     messages.add_message(request, messages.ERROR,
                                          'Invalid Key. This incident is logged',
                                          AlertTags.DANGER)
@@ -118,6 +129,8 @@ class ElectionView(LoginRequiredMixin, TemplateView):
                 non_neutral_votes = 0
                 for candidate in post.candidates.all():
                     if candidate.id not in keys:
+                        logger.error('Candidate %s with id %d is missing in user vote', candidate.name, candidate.id,
+                                     extra=logging_dict)
                         messages.add_message(request, messages.ERROR,
                                              'Found corrupted data. Incident will be reported',
                                              AlertTags.DANGER)
@@ -127,6 +140,7 @@ class ElectionView(LoginRequiredMixin, TemplateView):
                         non_neutral_votes += 1
 
                 if non_neutral_votes > post.number:
+                    logger.error('Number of non-neutral votes are greater than number of posts', extra=logging_dict)
                     messages.add_message(request, messages.ERROR,
                                          'Found invalid data. Attempt is logged',
                                          AlertTags.DANGER)
@@ -134,14 +148,16 @@ class ElectionView(LoginRequiredMixin, TemplateView):
 
             # Check if there is an entry present which are not pk for candidates in election available
             # To person
-            for _, value in keys.items():
+            for key, value in keys.items():
                 if not value[0]:
+                    logger.error('User has entered a candidate id %s which is not a valid value', key,
+                                 extra=logging_dict)
                     messages.add_message(request, messages.ERROR,
                                          'Found corrupted data. Incident will be reported',
                                          AlertTags.DANGER)
                     return self.get(request)
 
-            # create voes
+            # create votes
             vote_list = []
             for key, value in keys.items():
                 vote = Vote(candidate_id=key)
@@ -157,6 +173,7 @@ class ElectionView(LoginRequiredMixin, TemplateView):
             messages.add_message(request, messages.INFO, 'Your vote has been recorded', AlertTags.SUCCESS)
             return self.get(request, new_session=True)
         else:
+            logger.error('Request data is invalidated by serializer', extra=logging_dict)
             messages.add_message(request, messages.INFO,
                                  'Received corrupted data. Incident is recorded',
                                  AlertTags.DANGER)
