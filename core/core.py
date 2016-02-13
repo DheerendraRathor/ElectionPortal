@@ -1,7 +1,7 @@
 import re
 
-_year_part = r'\d\d'
-_program_part = r'[0-9D]'
+_year_part = r'[0-9]{1,2}'
+_program_part = r'[0-9A-Z]'
 _department_part = r'[0-9A-Z]{2}'
 _sequential_part = r'[0-9]{3,4}'
 
@@ -58,12 +58,10 @@ class VoterTypes(object):
 class VoteTypes(object):
     YES = 1
     NO = -1
-    NEUTRAL = 0
 
 VOTE_TYPE_DICT = {
     VoteTypes.YES: 'Yes',
     VoteTypes.NO: 'No',
-    VoteTypes.NEUTRAL: 'Neutral',
 }
 
 VOTE_TYPE_CHOICES = [(key, value) for key, value in VOTE_TYPE_DICT.items()]
