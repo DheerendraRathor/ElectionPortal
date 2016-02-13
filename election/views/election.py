@@ -10,7 +10,7 @@ from django.views.generic.base import TemplateView
 from account.views import VoterLogoutView
 from core.core import LOGGED_IN_SESSION_KEY, AlertTags, PostTypes, VoteTypes
 from core.security import get_client_ip
-from post.models import Post
+from post.models import Post, Candidate
 from vote.models import Vote
 from ..models import Election, Voter
 from ..serializers import AddVoteSerializer
@@ -20,6 +20,16 @@ logger = logging.getLogger(__name__)
 
 class ElectionView(LoginRequiredMixin, TemplateView):
     template_name = 'elections/election_view.html'
+
+    def _get_base_post_qs(self, post_types):
+        return Post.objects.all().filter(
+            type__in=post_types
+        ).order_by('order').prefetch_related(
+            Prefetch('candidates', queryset=Candidate.objects.filter(auto_generated=True).order_by('order'),
+                     to_attr='auto_candidates'),
+            Prefetch('candidates', queryset=Candidate.objects.exclude(auto_generated=True).order_by('order'),
+                     to_attr='human_candidates'),
+        )
 
     def _get_next_election(self):
         user = self.request.user
@@ -38,8 +48,7 @@ class ElectionView(LoginRequiredMixin, TemplateView):
         ).prefetch_related(
             Prefetch(
                 'posts',
-                queryset=Post.objects.all().filter(type__in=post_types).order_by('order').prefetch_related(
-                    'candidates'),
+                queryset=self._get_base_post_qs(post_types=post_types),
             ),
             Prefetch('voters', queryset=Voter.objects.all().filter(roll_no__iexact=profile.roll_number),
                      to_attr='voter'),

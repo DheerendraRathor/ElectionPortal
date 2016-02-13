@@ -205,8 +205,7 @@ class ElectionPreview(ElectionView):
         election = Election.objects.all().filter(pk=election_id).prefetch_related(
             Prefetch(
                 'posts',
-                queryset=Post.objects.all().filter(type__in=post_types).order_by('order').prefetch_related(
-                    'candidates'),
+                queryset=self._get_base_post_qs(post_types=post_types)
             )
         ).order_by('id')
 

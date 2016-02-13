@@ -7,9 +7,38 @@ from election.models import Election
 from .models import Candidate, Post
 
 
+class DefaultCandidateInline(admin.TabularInline):
+    """
+    This inline will keep auto_generate candidates which can't be deleted by normal users
+    """
+    model = Candidate
+    exclude = ['order']
+    verbose_name = 'Auto Generated Candidates'
+    extra = 0
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request).filter(auto_generated=True)
+        return qs
+
+    def get_readonly_fields(self, request, obj=None):
+        if not request.user.is_superuser:
+            return ['name', 'image']
+        return []
+
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+
 class CandidateInline(admin.TabularInline):
     model = Candidate
     extra = 0
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request).exclude(auto_generated=True)
+        return qs
 
     def get_max_num(self, request, obj=None, **kwargs):
         if not obj or request.user.is_superuser:
@@ -20,7 +49,7 @@ class CandidateInline(admin.TabularInline):
     def get_readonly_fields(self, request, obj=None):
         if not obj or request.user.is_superuser:
             return []
-        if obj.election != request.user or obj.election.has_activated:
+        if obj.election.creator != request.user or obj.election.has_activated:
             return ['name', 'image']
         return []
 
@@ -33,7 +62,7 @@ class CandidateInline(admin.TabularInline):
 @admin.register(Post)
 class PostAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
     list_display = ['name', 'number', 'election', 'type']
-    inlines = [CandidateInline]
+    inlines = [DefaultCandidateInline, CandidateInline]
     list_filter = [ElectionsFilter]
 
     def get_readonly_fields(self, request, obj=None):

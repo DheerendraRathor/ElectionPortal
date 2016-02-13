@@ -14,6 +14,7 @@ class Candidate(models.Model):
     order = models.IntegerField(default=0, help_text='Sorting order of candidates')
     is_nota = models.BooleanField(default=False, editable=False)
     is_neutral = models.BooleanField(default=False, editable=False)
+    auto_generated = models.BooleanField(default=False, editable=False)
 
     def __str__(self):
         return self.name

@@ -1,3 +1,11 @@
+var post_candidates;
+var post_selection;
+
+
+/**
+ * Set height of neutral and nota same as normal candidates
+ */
+
 /**
  * Set Dynamic affix
  */
@@ -24,6 +32,13 @@ $('input:radio').change(function () {
 
     var post = $(this).data('post');
     var candidate = $(this).data('candidate');
+
+    if ($(this).data('unique')){
+        reset_post_candidates(post);
+        $(this).prop('checked', true);
+        post_selection[post] = [];
+        return;
+    }
 
     change_candidates_color(post, candidate, value);
 
@@ -64,12 +79,14 @@ function change_candidates_color(post, candidate, value) {
 }
 
 function reset_post_candidates(post) {
-    var post_candidates = $('#post-{0} .candidate-poster'.format(post));
+    var int_post = parseInt(post);
+    var _post_candidates = post_candidates[int_post];
 
-    post_candidates.each(function () {
-        $(this).removeClass('accepted-candidate');
-        $(this).removeClass('rejected-candidate');
-        $('#candidate-{0}-neutral'.format($(this).data('candidate'))).prop('checked', true);
+    $.each(_post_candidates, function (index, value) {
+        var $candidate_poster = $("#candidate-{0}-poster".format(value));
+        $candidate_poster.removeClass('accepted-candidate');
+        $candidate_poster.removeClass('rejected-candidate');
+        $('input[name="candidate-{0}"'.format(value)).prop('checked', false);
     });
 
 }
