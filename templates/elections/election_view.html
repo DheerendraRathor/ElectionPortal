@@ -180,7 +180,7 @@
                                                         Yes
                                                     </label>
                                                 </div>
-                                                {% if post.number == post.human_candidates|length %}
+                                                {% if post.number >= post.human_candidates|length %}
                                                     <div class="radio">
                                                         <input name="candidate-{{ candidate.id }}"
                                                                id="candidate-{{ candidate.id }}-no"

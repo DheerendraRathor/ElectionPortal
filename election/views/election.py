@@ -10,8 +10,9 @@ from django.views.generic.base import TemplateView
 from account.views import VoterLogoutView
 from core.core import LOGGED_IN_SESSION_KEY, AlertTags, PostTypes, VoteTypes
 from core.security import get_client_ip
-from post.models import Post, Candidate
-from vote.models import Vote
+from post.models import Candidate, Post
+from vote.models import Vote, VoteSession
+
 from ..models import Election, Voter
 from ..serializers import AddVoteSerializer
 
@@ -135,20 +136,60 @@ class ElectionView(LoginRequiredMixin, TemplateView):
             # Like it checks for posts for which voter should be allowed to vote (UG/PG)
             # It also checks if number of non-neutral votes for a post are less then total posts.
             for post in election.posts.all():
-                non_neutral_votes = 0
-                for candidate in post.candidates.all():
-                    if candidate.id not in keys:
-                        logger.error('Candidate %s with id %d is missing in user vote', candidate.name, candidate.id,
-                                     extra=logging_dict)
-                        messages.add_message(request, messages.ERROR,
-                                             'Found corrupted data. Incident will be reported',
-                                             AlertTags.DANGER)
-                        return self.get(request)
-                    keys[candidate.id] = (True, keys[candidate.id][1])
-                    if keys[candidate.id][1] != VoteTypes.NEUTRAL:
-                        non_neutral_votes += 1
+                non_neutral_nota_votes = 0
 
-                if non_neutral_votes > post.number:
+                candidate_count = len(post.human_candidates)
+
+                post_processed = False
+
+                for candidate in post.auto_candidates:
+                    if candidate.id in keys:
+                        if post_processed:
+                            logger.error('Multiple entries for non auto candidates', extra=logging_dict)
+                            messages.add_message(request, messages.ERROR,
+                                                 'Found invalid data. Attempt is logged',
+                                                 AlertTags.DANGER)
+                            return self.get(request)
+
+                        keys[candidate.id] = (True, keys[candidate.id][1])
+
+                        # Checking if NO is voted for neutral and NOTA
+                        if keys[candidate.id][1] == VoteTypes.NO:
+                            logger.log('User voted for NO for auto accounts. User is stupid',
+                                       extra=logging_dict)
+                            messages.add_message(request, messages.ERROR,
+                                                 'Found invalid data. Attempt is logged',
+                                                 AlertTags.DANGER)
+                            return self.get(request)
+
+                        post_processed = True
+
+                for candidate in post.human_candidates:
+                    if candidate.id in keys:
+                        if post_processed:
+                            logger.error('Entries for normal candidates is present when with auto candidates',
+                                         extra=logging_dict)
+                            messages.add_message(request, messages.ERROR,
+                                                 'Found invalid data. Attempt is logged',
+                                                 AlertTags.DANGER)
+                            return self.get(request)
+
+                        keys[candidate.id] = (True, keys[candidate.id][1])
+
+                        if keys[candidate.id][1] == VoteTypes.NO:
+                            """
+                            Checking if NO vote is casted for a post where candidates > post
+                            """
+                            if candidate_count > post.number:
+                                logger.error('Voted NO for a post where candidates > post', extra=logging_dict)
+                                messages.add_message(request, messages.ERROR,
+                                                     'Found invalid data. Attempt is logged',
+                                                     AlertTags.DANGER)
+                                return self.get(request)
+
+                        non_neutral_nota_votes += 1
+
+                if non_neutral_nota_votes > post.number:
                     logger.error('Number of non-neutral votes are greater than number of posts', extra=logging_dict)
                     messages.add_message(request, messages.ERROR,
                                          'Found invalid data. Attempt is logged',
@@ -167,14 +208,18 @@ class ElectionView(LoginRequiredMixin, TemplateView):
                     return self.get(request)
 
             # create votes
-            vote_list = []
-            for key, value in keys.items():
-                vote = Vote(candidate_id=key)
-                vote.vote = value[1]
-                vote_list.append(vote)
 
-            # Add vote to server
             with transaction.atomic():
+                # Create Session. Each vote will be associated with a session
+                vote_session = VoteSession.objects.create()
+
+                vote_list = []
+                for key, value in keys.items():
+                    vote = Vote(candidate_id=key, session=vote_session)
+                    vote.vote = value[1]
+                    vote_list.append(vote)
+
+                # Add votes to server
                 Vote.objects.bulk_create(vote_list)
                 voter.voted = True
                 voter.save()

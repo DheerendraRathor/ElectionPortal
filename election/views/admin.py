@@ -18,8 +18,9 @@ from django.views.generic.base import TemplateView
 
 from core.core import IITB_ROLL_REGEX, POST_TYPE_DICT, AlertTags, PostTypes, VoteTypes
 from post.models import Candidate, Post
-from .election import ElectionView
+
 from ..models import Election, Tag, Voter
+from .election import ElectionView
 
 
 class AddVotersView(TemplateView):
@@ -181,8 +182,6 @@ class ElectionResultView(TemplateView):
                              Case(When(votes__vote=VoteTypes.YES, then=1), default=0, output_field=IntegerField())),
                          no_votes=Sum(
                              Case(When(votes__vote=VoteTypes.NO, then=1), default=0, output_field=IntegerField())),
-                         neutral_votes=Sum(
-                             Case(When(votes__vote=VoteTypes.NEUTRAL, then=1), default=0, output_field=IntegerField())),
                      ))
         )
 

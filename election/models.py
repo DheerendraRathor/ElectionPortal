@@ -1,11 +1,11 @@
 import random
 
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator
 from django.db import models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
-from django.core.validators import MaxValueValidator
-from django.conf import settings
 
 
 class Election(models.Model):

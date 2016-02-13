@@ -1,14 +1,13 @@
 import csv
 
-from django.contrib import admin
-from django.http.response import HttpResponse
+from django.contrib import admin, messages
 from django.db import transaction
+from django.http.response import HttpResponse
 
 from core.admin import RemoveDeleteSelectedMixin
 from core.admin_filters import ElectionsFilter
 
 from ..models import Election, Voter
-from django.contrib import messages
 
 
 @admin.register(Voter)

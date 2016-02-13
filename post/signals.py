@@ -1,10 +1,10 @@
 import os
 
-from django.db.models.signals import post_save, pre_save, post_delete
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from django.templatetags.static import static
 
-from post.models import Post, Candidate
+from post.models import Candidate, Post
 
 
 @receiver(post_save, sender=Post)
@@ -18,7 +18,7 @@ def create_default_candidates(sender, instance: Post, **kwargs) -> None:
     """
     try:
         Candidate.objects.get_or_create(is_nota=True, post=instance, defaults={
-            'name': 'None of the Above',
+            'name': 'None of These',
             'image': static('img/nota.jpg'),
             'auto_generated': True,
         })
