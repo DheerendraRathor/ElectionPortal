@@ -34,7 +34,7 @@ class VoterLoginView(FormView):
             user = authenticate(username=username, password=password)
             if user and user.is_authenticated():
                 if not user.user_profile.can_vote:
-                    form.add_error(None, 'Only {0} are allowed to vote'.format(','.join(CAN_VOTE)))
+                    form.add_error(None, 'Only students are allowed to vote')
                     return render(request, self.template_name, {'form': form})
                 is_valid_voter = Voter.objects.all().filter(
                     roll_no__iexact=user.user_profile.roll_number,
