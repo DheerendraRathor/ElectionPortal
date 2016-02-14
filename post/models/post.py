@@ -5,7 +5,7 @@ from election.models import Election
 
 
 class Post(models.Model):
-    name = models.CharField(max_length=32, db_index=True)
+    name = models.CharField(max_length=64, db_index=True)
     number = models.IntegerField(default=1)
     election = models.ForeignKey(Election, related_name='posts', db_index=True)
     type = models.IntegerField(choices=POST_TYPE_CHOICES, default=0)

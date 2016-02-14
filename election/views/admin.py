@@ -97,7 +97,7 @@ class AddVotersView(TemplateView):
             messages.add_message(self.request, messages.ERROR, 'Roll Columns must be an integer')
             return self.get(self.request, *args, *kwargs)
 
-        reader = csv.reader(codecs.iterdecode(file, 'utf-8'), delimiter=',')
+        reader = csv.reader(codecs.iterdecode(file, 'utf-8', errors='ignore'), delimiter=',')
         index = 0
         new_voters_added = 0
         message = ''
@@ -105,13 +105,15 @@ class AddVotersView(TemplateView):
         try:
             with transaction.atomic():
                 voter_list = []
+
                 for row in reader:
                     index += 1
                     if skip_one_row and index == 1:  # First Row
                         continue
 
                     try:
-                        roll_number = row[roll_column]
+                        roll_number = row[roll_column]  # type: str
+                        roll_number = roll_number.strip()
                     except IndexError:
                         if not skip_errors:
                             message = 'Invalid line found in data at line number %d : %s' % (index, ','.join(row))
