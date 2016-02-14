@@ -3,7 +3,7 @@ import re
 _year_part = r'[0-9]{1,2}'
 _program_part = r'[0-9A-Z]'
 _department_part = r'[0-9A-Z]{2}'
-_sequential_part = r'[0-9]{3,4}'
+_sequential_part = r'[0-9A-Z]{3,4}'
 
 IITB_ROLL_REGEX = re.compile(r'^' +
                              _year_part +
