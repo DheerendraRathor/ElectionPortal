@@ -52,7 +52,13 @@ class ElectionAdmin(RemoveDeleteSelectedMixin, SimpleHistoryAdmin):
     list_filter = ['is_active', 'is_finished']
     date_hierarchy = 'created_at'
     inlines = [PostInline]
-    actions = ['download_voters_action']
+    actions = ['download_voters_action', 'activate_all']
+
+    def activate_all(self, request, queryset):
+        # TODO: Filter by user
+        queryset.update(is_active=True)
+
+    activate_all.short_description = 'Activate selected elections'
 
     def download_voters_action(self, request, queryset):
         response = HttpResponse(content_type='text/csv')
