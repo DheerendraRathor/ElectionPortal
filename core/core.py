@@ -16,7 +16,7 @@ IITB_ROLL_REGEX = re.compile(r'^' +
 
 EXTENDED_UG_REGEX = re.compile(r'^' +
                                _year_part +
-                               r'[5ik]' +
+                               r'[5ikb]' +
                                _department_part +
                                _sequential_part +
                                r'$',
@@ -43,11 +43,11 @@ POST_TYPE_DICT = {
 
 POST_TYPE_CHOICES = [(key, value) for key, value in POST_TYPE_DICT.items()]
 
-CAN_VOTE = ['UG', 'PG', 'DD']
+CAN_VOTE = ['UG', 'PG', 'DD', 'RS']
 
 UG_TYPE = ['UG', 'DD']
 
-PG_TYPE = ['PG']
+PG_TYPE = ['PG', 'RS']
 
 
 class VoterTypes(object):

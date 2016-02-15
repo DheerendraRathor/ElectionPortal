@@ -141,6 +141,7 @@ class ElectionView(LoginRequiredMixin, TemplateView):
                 candidate_count = len(post.human_candidates)
 
                 post_processed = False
+                processed_candidate = None
 
                 for candidate in post.auto_candidates:
                     if candidate.id in keys:
@@ -162,13 +163,16 @@ class ElectionView(LoginRequiredMixin, TemplateView):
                                                  AlertTags.DANGER)
                             return self.get(request)
 
+                        processed_candidate = candidate.id
                         post_processed = True
 
                 for candidate in post.human_candidates:
                     if candidate.id in keys:
                         if post_processed:
-                            logger.error('Entries for normal candidates is present when with auto candidates',
+                            logger.error('Entries for normal candidates is present when with auto candidates %d:%d' %
+                                         (processed_candidate, candidate.id),
                                          extra=logging_dict)
+
                             messages.add_message(request, messages.ERROR,
                                                  'Found invalid data. Attempt is logged',
                                                  AlertTags.DANGER)

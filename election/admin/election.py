@@ -48,14 +48,16 @@ class PostInline(admin.TabularInline):
 
 @admin.register(Election)
 class ElectionAdmin(RemoveDeleteSelectedMixin, SimpleHistoryAdmin):
-    list_display = ['name', 'creator', 'created_at', 'is_active', 'is_finished']
+    list_display = ['id', 'name', 'creator', 'created_at', 'is_active', 'is_finished']
     list_filter = ['is_active', 'is_finished']
     date_hierarchy = 'created_at'
     inlines = [PostInline]
     actions = ['download_voters_action', 'activate_all']
 
     def activate_all(self, request, queryset):
-        # TODO: Filter by user
+        if not request.user.is_superuser:
+            queryset = queryset.filter(creator=request.user)
+
         queryset.update(is_active=True)
 
     activate_all.short_description = 'Activate selected elections'
