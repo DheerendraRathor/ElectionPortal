@@ -56,7 +56,7 @@ class Tag(models.Model):
 
 
 def generate_random_voter_key():
-    return ''.join(random.choice('0123456789ABCDEF') for _ in range(settings.VOTER_KEY_LENGTH))
+    return ''.join(random.choice('123456789ABCDFGH') for _ in range(settings.VOTER_KEY_LENGTH))
 
 
 class Voter(models.Model):
