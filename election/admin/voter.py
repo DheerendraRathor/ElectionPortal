@@ -67,3 +67,6 @@ class VoterAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return self.has_change_permission(request, obj)
+
+    class Media:
+        js = ['admin/js/list_filter_collapse.js', ]

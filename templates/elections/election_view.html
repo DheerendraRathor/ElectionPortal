@@ -86,6 +86,52 @@
                             </div>
                             <div class="row row-centered candidate-list">
 
+                                {% for candidate in post.human_candidates %}
+                                    <div id="candidate-{{ candidate.id }}"
+                                         class="candidate col-sm-4 col-md-3 col-centered">
+                                        <div id="candidate-{{ candidate.id }}-poster"
+                                             class="candidate-poster thumbnail"
+                                             data-candidate="{{ candidate.id }}"
+                                        >
+                                            <img class="img-circle img-thumbnail"
+                                                 style="width: 250px; height: 250px; display: block;" src="
+                                                     {% if candidate.image %}{{ candidate.image.url }}{% else %}
+                                                     {% static 'img/default_user.png' %}{% endif %}"
+                                            >
+
+                                            <div class="caption text-capitalize text-center">
+                                                <h4>{{ candidate.name }}</h4>
+                                                <div class="radio">
+                                                    <input name="candidate-{{ candidate.id }}"
+                                                           id="candidate-{{ candidate.id }}-yes"
+                                                           type="radio"
+                                                           value="1"
+                                                           data-post="{{ post.id }}"
+                                                           data-candidate="{{ candidate.id }}"
+                                                    />
+                                                    <label for="candidate-{{ candidate.id }}-yes">
+                                                        Yes
+                                                    </label>
+                                                </div>
+                                                {% if post.number >= post.human_candidates|length %}
+                                                    <div class="radio">
+                                                        <input name="candidate-{{ candidate.id }}"
+                                                               id="candidate-{{ candidate.id }}-no"
+                                                               type="radio"
+                                                               value="-1"
+                                                               data-post="{{ post.id }}"
+                                                               data-candidate="{{ candidate.id }}"
+                                                        />
+                                                        <label for="candidate-{{ candidate.id }}-no">
+                                                            No
+                                                        </label>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+
                                 <div class="candidate text-center col-sm-4 col-md-3 col-centered">
                                     {% comment %}
                                     The following piece of code is highly unoptimized and completely intentional.
@@ -152,52 +198,6 @@
 
                                     {% endfor %}
                                 </div>
-
-                                {% for candidate in post.human_candidates %}
-                                    <div id="candidate-{{ candidate.id }}"
-                                         class="candidate col-sm-4 col-md-3 col-centered">
-                                        <div id="candidate-{{ candidate.id }}-poster"
-                                             class="candidate-poster thumbnail"
-                                             data-candidate="{{ candidate.id }}"
-                                        >
-                                            <img class="img-circle img-thumbnail"
-                                                 style="width: 250px; height: 250px; display: block;" src="
-                                                     {% if candidate.image %}{{ candidate.image.url }}{% else %}
-                                                     {% static 'img/default_user.png' %}{% endif %}"
-                                            >
-
-                                            <div class="caption text-capitalize text-center">
-                                                <h4>{{ candidate.name }}</h4>
-                                                <div class="radio">
-                                                    <input name="candidate-{{ candidate.id }}"
-                                                           id="candidate-{{ candidate.id }}-yes"
-                                                           type="radio"
-                                                           value="1"
-                                                           data-post="{{ post.id }}"
-                                                           data-candidate="{{ candidate.id }}"
-                                                    />
-                                                    <label for="candidate-{{ candidate.id }}-yes">
-                                                        Yes
-                                                    </label>
-                                                </div>
-                                                {% if post.number >= post.human_candidates|length %}
-                                                    <div class="radio">
-                                                        <input name="candidate-{{ candidate.id }}"
-                                                               id="candidate-{{ candidate.id }}-no"
-                                                               type="radio"
-                                                               value="-1"
-                                                               data-post="{{ post.id }}"
-                                                               data-candidate="{{ candidate.id }}"
-                                                        />
-                                                        <label for="candidate-{{ candidate.id }}-no">
-                                                            No
-                                                        </label>
-                                                    </div>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endfor %}
 
                             </div>
                         </div>

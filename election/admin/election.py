@@ -49,6 +49,8 @@ class PostInline(admin.TabularInline):
 @admin.register(Election)
 class ElectionAdmin(RemoveDeleteSelectedMixin, SimpleHistoryAdmin):
     list_display = ['name', 'creator', 'created_at', 'is_active', 'is_finished']
+    list_filter = ['is_active', 'is_finished']
+    date_hierarchy = 'created_at'
     inlines = [PostInline]
     actions = ['download_voters_action']
 
@@ -136,3 +138,6 @@ class ElectionAdmin(RemoveDeleteSelectedMixin, SimpleHistoryAdmin):
         if request.user.is_superuser:
             return True
         return obj and obj.creator == request.user and not obj.has_activated
+
+    class Media:
+        js = ['admin/js/list_filter_collapse.js', ]
