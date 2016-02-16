@@ -99,7 +99,7 @@ class ElectionView(LoginRequiredMixin, TemplateView):
             election = self._get_next_election()
 
             if not election:
-                logger.error('User has not valid election left', extra=logging_dict)
+                logger.error('User has no valid election left', extra=logging_dict)
                 messages.add_message(request, messages.ERROR,
                                      'You\'ve no active election. This incident is logged',
                                      AlertTags.DANGER)
@@ -119,7 +119,8 @@ class ElectionView(LoginRequiredMixin, TemplateView):
 
             # Validate key
             if election.is_key_required:
-                if serialized_data.validated_data['key'] != voter.key:
+                key = serialized_data.validated_data['key']
+                if not key or key.upper() != voter.key.upper():
                     logger.error('User has entered invalid key', extra=logging_dict)
                     messages.add_message(request, messages.ERROR,
                                          'Invalid Key. This incident is logged',
