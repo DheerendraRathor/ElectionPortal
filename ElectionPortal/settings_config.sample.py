@@ -38,3 +38,6 @@ SESSION_COOKIE_PATH = "/"
 CSRF_COOKIE_PATH = "/"
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# DATABASES
+# Define databases here to override default Databases.

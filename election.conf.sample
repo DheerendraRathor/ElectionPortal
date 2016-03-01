@@ -1,0 +1,61 @@
+upstream election {
+    server 127.0.0.1:1996;
+}
+
+set $server el.d.sr;
+
+server {
+    listen 80;
+    server_name $server;
+
+    return 302 https://$server_name$request_uri;
+}
+
+server {
+    listen 443 ssl;
+
+    # sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    # -keyout /etc/nginx/ssl/election.key \
+    # -out /etc/nginx/ssl/election.crt
+    ssl_certificate /etc/nginx/ssl/election.crt;
+    ssl_certificate_key /etc/nginx/ssl/election.key;
+
+    server_name $server;
+    client_max_body_size 10M;
+    access_log /var/log/nginx/el-access.log;
+    error_log /var/log/nginx/el-error.log;
+
+    set $root /home/dheerendra/Desktop/Project/ElectionPortal;
+
+    location /favicon.ico {
+        expires 1y;
+        add_header Pragma public;
+        add_header Cache-Control "public";
+        alias $root/staticfiles/img/favicon.ico;
+    }
+
+    location /static/ {
+        expires 1y;
+        add_header Pragma public;
+        add_header Cache-Control "public";
+        alias   $root/staticfiles/;
+    }
+
+    location /media/ {
+        expires 1y;
+        add_header Pragma public;
+        add_header Cache-Control "public";
+        alias $root/media/;
+    }
+
+    location /{
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header Host $http_host;
+        proxy_redirect off;
+        proxy_connect_timeout 3600;
+        proxy_read_timeout 3600;
+    	proxy_pass http://election;
+	    access_log /var/log/nginx/el-access-forward.log;
+    }
+
+}
