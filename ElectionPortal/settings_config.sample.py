@@ -23,7 +23,7 @@ EMAIL_BACKEND = "core.notification.IITBEmailBackend"
 
 SERVER_EMAIL = ""
 
-EMAIL_SUBJECT_PREFIX = '[LDAPSSO] '
+EMAIL_SUBJECT_PREFIX = '[Election Portal] '
 
 ADMINS = (
     ('Dheerendra Rathor', 'dheeru.rathor14@gmail.com'),
