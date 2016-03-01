@@ -17,6 +17,12 @@ class VoterAdmin(RemoveDeleteSelectedMixin, admin.ModelAdmin):
     search_fields = ['roll_no']
     actions = ['download_voters_action', 'shuffle_voters_keys']
 
+    def lookup_allowed(self, lookup, value):
+        lookup = lookup.lower()
+        if lookup.startswith('voted'):
+            return False
+        return super().lookup_allowed(lookup, value)
+
     def download_voters_action(self, request, queryset):
         response = HttpResponse(content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="voters.csv"'
