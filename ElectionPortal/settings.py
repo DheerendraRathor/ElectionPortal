@@ -244,4 +244,6 @@ logging.config.dictConfig(LOGGING)
 
 X_FRAME_OPTIONS = 'DENY'
 
+LOGIN_URL = 'accounts:login'
+
 from .settings_config import *  # noqa isort:skip
