@@ -61,3 +61,11 @@
     overflow:hidden;
     padding-bottom:100%;
 }
+
+.manifesto-url {
+    color: #9BB8D2;
+}
+
+.manifesto-url:hover{
+    color: #9E6EBE;
+}

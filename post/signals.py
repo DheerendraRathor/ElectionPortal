@@ -46,6 +46,10 @@ def auto_delete_file_on_delete(sender, instance: Candidate, **kwargs) -> None:
         if os.path.isfile(instance.image.path):
             os.remove(instance.image.path)
 
+    if instance.manifesto:
+        if os.path.isfile(instance.manifesto.path):
+            os.remove(instance.manifesto.path)
+
 
 @receiver(pre_save, sender=Candidate)
 def auto_delete_file_on_change(sender, instance: Candidate, **kwargs):
@@ -59,14 +63,24 @@ def auto_delete_file_on_change(sender, instance: Candidate, **kwargs):
         return False
 
     try:
-        old_image = Candidate.objects.get(pk=instance.pk).image
+        old_candidate = Candidate.objects.get(pk=instance.pk)
     except Candidate.DoesNotExist:
         return False
 
+    old_image = old_candidate.image
     new_image = instance.image
     if not old_image == new_image:
         try:
             if os.path.isfile(old_image.path):
                 os.remove(old_image.path)
+        except:
+            pass
+
+    old_manifesto = old_candidate.manifesto
+    new_manifesto = instance.manifesto
+    if not old_manifesto == new_manifesto:
+        try:
+            if os.path.isfile(old_manifesto.path):
+                os.remove(old_manifesto.path)
         except:
             pass

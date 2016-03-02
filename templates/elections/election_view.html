@@ -100,7 +100,16 @@
                                             >
 
                                             <div class="caption text-capitalize text-center">
-                                                <h4>{{ candidate.name }}</h4>
+                                                <h3>{{ candidate.name }}</h3>
+
+                                                {% comment %}Dispaly Manifesto here {% endcomment %}
+                                                {% if election.display_manifesto and candidate.manifesto %}
+                                                    <h4><a class="manifesto-url"
+                                                           href="{{ candidate.manifesto.url }}"
+                                                           target="_blank">Manifesto</a> </h4>
+                                                {% endif %}
+
+                                                {% comment %}Voting buttons {% endcomment %}
                                                 <div class="radio">
                                                     <input name="candidate-{{ candidate.id }}"
                                                            id="candidate-{{ candidate.id }}-yes"

@@ -19,6 +19,7 @@ class Election(models.Model):
     finished_at = models.DateTimeField(blank=True, null=True)
     is_key_required = models.BooleanField(default=True)
     keep_nota_option = models.BooleanField(default=True, help_text='Keep None of The Above as a valid vote in posts')
+    display_manifesto = models.BooleanField(default=True, help_text='Display manifestos for candidates if present')
     session_timeout = models.PositiveSmallIntegerField(
         default=120,
         validators=[
