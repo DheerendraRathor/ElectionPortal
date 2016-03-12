@@ -56,38 +56,11 @@
     {% block body %}
     {% endblock %}
 
-    <div class="site-footer">
-        <div class="row text-center">
-            <div class="col-md-4 form-group">
-                &copy; {% now "Y" %} <a href="http://gymkhana.iitb.ac.in/" target="_blank">Gymkhana, IIT Bombay</a>
-            </div>
-            <div class="col-md-4 form-group">
-                Created By: <a href="https://fb.com/DheerendraRathor" target="_blank">Dheerendra Rathor</a>
-            </div>
-            <div class="col-md-4 form-group">
-                <a href="http://www.djangoproject.com/"><img
-                        src="https://www.djangoproject.com/m/img/badges/djangomade124x25.gif" border="0"
-                        alt="Made with Django." title="Made with Django."/></a>
-            </div>
+    {% block footer %}
+        <div class="container">
+            {% include 'footer.html' %}
         </div>
-        <div class="row">
-            <div class="col-md-4 form-group">
-
-                <div class="row text-center">
-                    Other Links:
-                    <div class="col-md-12">
-                        <a href="https://github.com/DheerendraRathor/ElectionPortal" target="_blank">Source Code</a>
-                    </div>
-                    <div class="col-md-12">
-                        <a href="https://github.com/DheerendraRathor/ElectionPortal/issues"
-                           target="_blank">Bugs/Suggestions</a>
-                    </div>
-                </div>
-
-
-            </div>
-        </div>
-    </div>
+    {% endblock footer %}
 </div>
 
 <script type="text/javascript" src="{% static 'js/jquery.min.js' %}"></script>

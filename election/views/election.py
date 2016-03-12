@@ -11,7 +11,7 @@ from account.views import VoterLogoutView
 from core.core import LOGGED_IN_SESSION_KEY, AlertTags, PostTypes, VoteTypes
 from core.security import get_client_ip
 from post.models import Candidate, Post
-from vote.models import Vote, VoteSession
+from vote.models import Vote, VoteSession, VoteIPMap
 
 from ..models import Election, Voter
 from ..serializers import AddVoteSerializer
@@ -73,9 +73,26 @@ class ElectionView(LoginRequiredMixin, TemplateView):
             request.method = 'POST'
             return VoterLogoutView.as_view()(request)
 
+        logging_dict = {
+            'client_ip': get_client_ip(request),
+            'user': request.user,
+            'body': '',
+            'election': election.id,
+        }
+
+        if election.votes_per_ip > 0:
+            votes_for_this_ip = election.vote_ips.filter(ip=logging_dict['client_ip']).first()
+            if votes_for_this_ip:
+                if votes_for_this_ip.votes >= election.votes_per_ip:
+                    logger.error('User is voting for extra votes', extra=logging_dict)
+                    messages.add_message(request, messages.ERROR,
+                                         'Only {} vote(s) are allowed per IP'.format(election.votes_per_ip),
+                                         AlertTags.DANGER)
+                    request.method = 'POST'
+                    return VoterLogoutView.as_view()(request)
+
         new_session = kwargs.pop('new_session', False)
         if new_session or logged_in:
-            # Uncomment following line to extend session for each election
             request.session.set_expiry(timedelta(seconds=election.session_timeout))
             pass
 
@@ -106,6 +123,19 @@ class ElectionView(LoginRequiredMixin, TemplateView):
                 return self.get(request)
 
             logging_dict['election'] = election.id
+
+            votes_for_this_ip = None
+
+            if election.votes_per_ip > 0:
+                votes_for_this_ip = election.vote_ips.filter(ip=logging_dict['client_ip']).first()
+                if votes_for_this_ip:
+                    if votes_for_this_ip.votes >= election.votes_per_ip:
+                        logger.error('User is voting for extra votes', extra=logging_dict)
+                        messages.add_message(request, messages.ERROR,
+                                             'Only {} vote(s) are allowed per IP'.format(election.votes_per_ip),
+                                             AlertTags.DANGER)
+                        request.method = 'POST'
+                        return VoterLogoutView.as_view()(request)
 
             # Validate is valid voter
             voters = election.voter
@@ -217,6 +247,17 @@ class ElectionView(LoginRequiredMixin, TemplateView):
             with transaction.atomic():
                 # Create Session. Each vote will be associated with a session
                 vote_session = VoteSession.objects.create()
+
+                if not votes_for_this_ip:
+                    votes_for_this_ip = VoteIPMap(
+                        election=election,
+                        votes=1,
+                        ip=logging_dict['client_ip'],
+                    )
+                else:
+                    votes_for_this_ip.votes += 1
+
+                votes_for_this_ip.save()
 
                 vote_list = []
                 for key, value in keys.items():

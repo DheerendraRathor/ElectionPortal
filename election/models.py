@@ -27,6 +27,10 @@ class Election(models.Model):
         ],
         help_text='Seconds after which session will be timed out',
     )
+    votes_per_ip = models.PositiveSmallIntegerField(
+        default=0,
+        help_text='Max votes allowed per IP. Keep it 0 to allow unlimited votes per IP',
+    )
     _history_ = HistoricalRecords()
 
     @property
