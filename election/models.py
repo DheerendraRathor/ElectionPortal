@@ -14,10 +14,10 @@ class Election(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=False, db_index=True)
-    is_temporary_closed = models.BooleanField(default=False, help_text='Election temporary closed')
-    is_finished = models.BooleanField(default=False, db_index=True)
+    is_temporary_closed = models.BooleanField(default=False, help_text='Election temporarily closed')
+    is_finished = models.BooleanField(default=False, db_index=True, help_text='If checked, election will close!')
     finished_at = models.DateTimeField(blank=True, null=True)
-    is_key_required = models.BooleanField(default=True)
+    is_key_required = models.BooleanField(default=True, help_text='Keep voting key for election')
     keep_nota_option = models.BooleanField(default=True, help_text='Keep None of The Above as a valid vote in posts')
     display_manifesto = models.BooleanField(default=True, help_text='Display manifestos for candidates if present')
     session_timeout = models.PositiveSmallIntegerField(
