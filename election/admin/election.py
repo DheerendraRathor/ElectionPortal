@@ -49,6 +49,7 @@ class PostInline(admin.TabularInline):
 @admin.register(Election)
 class ElectionAdmin(RemoveDeleteSelectedMixin, SimpleHistoryAdmin):
     list_display = ['id', 'name', 'creator', 'created_at', 'is_active', 'is_finished']
+    list_display_links = ['id', 'name']
     list_filter = ['is_active', 'is_finished']
     date_hierarchy = 'created_at'
     inlines = [PostInline]
