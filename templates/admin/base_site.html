@@ -1,5 +1,5 @@
 {% extends "admin/base.html" %}
-{% load staticfiles %}
+{% load staticfiles i18n %}
 
 {% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
 
@@ -12,6 +12,16 @@
 {% block extrastyle %}
     <link type="text/css" rel="stylesheet" href="{% static 'css/root.css' %}"/>
     <link type="text/css" rel="stylesheet" href="{% static 'admin/css/footer.css' %}"/>
+{% endblock %}
+
+{% block userlinks %}
+    {% if user.is_active and user.is_staff %}
+        <b><a href="{% url 'election:docs' %}">{% trans 'Documentation' %}</a></b> /
+    {% endif %}
+    {% if user.has_usable_password %}
+        <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
+    {% endif %}
+    <a href="{% url 'admin:logout' %}">{% trans 'Log out' %}</a>
 {% endblock %}
 
 {% block footer %}

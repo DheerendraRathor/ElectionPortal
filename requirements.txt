@@ -8,3 +8,4 @@ isort==4.2.2
 python-memcached==1.57
 pytz==2015.7
 psycopg2
+markdown

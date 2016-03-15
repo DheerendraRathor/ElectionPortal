@@ -13,7 +13,8 @@ class Election(models.Model):
     creator = models.ForeignKey(User, related_name='elections', db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
-    is_active = models.BooleanField(default=False, db_index=True)
+    is_active = models.BooleanField(default=False, db_index=True,
+                                    help_text='Check it to start Election')
     is_temporary_closed = models.BooleanField(default=False, help_text='Election temporarily closed')
     is_finished = models.BooleanField(default=False, db_index=True, help_text='If checked, election will close!')
     finished_at = models.DateTimeField(blank=True, null=True)

@@ -6,7 +6,9 @@ This file contains election views which requires admin permission and are relate
 """
 import codecs
 import csv
+import os
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.admin import site
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
@@ -14,7 +16,9 @@ from django.db import transaction
 from django.db.models import Case, Count, IntegerField, Prefetch, Sum, When
 from django.forms.widgets import SelectMultiple
 from django.http.response import Http404
+from django.template.loader import get_template
 from django.views.generic.base import TemplateView
+from markdown import Markdown
 
 from core.core import IITB_ROLL_REGEX, POST_TYPE_DICT, AlertTags, PostTypes, VoteTypes
 from post.models import Candidate, Post
@@ -223,3 +227,14 @@ class ElectionPreview(ElectionView):
     def post(self, request, *args, **kwargs):
         messages.add_message(request, messages.ERROR, 'Cannot cast vote in election preview.', AlertTags.DANGER)
         return self.get(request)
+
+
+class ElectionDocsView(TemplateView):
+    template_name = 'admin/election_docs.html'
+
+    def get(self, request, *args, **kwargs):
+        raw_md = get_template('admin/election_doc.md')
+        rendered_md = raw_md.render(context=self.get_context_data(**kwargs), request=request)
+        md_html_output = Markdown(output_format='html5').convert(rendered_md)
+        kwargs['main_doc_content'] = md_html_output
+        return super().get(request, *args, **kwargs)

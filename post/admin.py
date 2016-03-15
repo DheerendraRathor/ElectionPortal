@@ -22,7 +22,7 @@ class DefaultCandidateInline(admin.TabularInline):
 
     def get_readonly_fields(self, request, obj=None):
         if not request.user.is_superuser:
-            return ['name', 'image']
+            return ['name', 'image', 'manifesto']
         return []
 
     def has_add_permission(self, request):
