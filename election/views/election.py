@@ -243,7 +243,7 @@ class ElectionView(LoginRequiredMixin, TemplateView):
 
             with transaction.atomic():
                 # Create Session. Each vote will be associated with a session
-                vote_session = VoteSession.objects.create()
+                vote_session = VoteSession.objects.create(election=election)
 
                 if not votes_for_this_ip:
                     votes_for_this_ip = VoteIPMap(
