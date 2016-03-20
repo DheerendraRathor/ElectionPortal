@@ -73,6 +73,9 @@
                 <div class="row" style="padding: 0 10px 0 10px;">
                     <div class="col-md-12">
                         <h1 class="election-title text-center">{{ election.name }}</h1>
+                        <p class="text-center text-primary">
+                            Created By: {{ election.creator.get_full_name }} &lt;{{ election.creator }}@iitb.ac.in&gt;
+                        </p>
                     </div>
                 </div>
 
@@ -84,6 +87,65 @@
                                 <h2 class="post-title">{{ post.name }}</h2>
                                 <h4 class="post-title">Available Posts: {{ post.number }}</h4>
                             </div>
+
+                            <div class="row row-centered candidate-list"
+                                 style="padding-bottom: 20px;">
+
+                                {% comment %}
+                                    The following piece of code is highly unoptimized and completely intentional.
+                                {% endcomment %}
+                                {% with humans=post.human_candidates %}
+                                    {% for candidate in post.auto_candidates %}
+
+                                        {% if candidate.is_neutral %}
+                                            <div class="auto-candidate candidate text-center text-warning col-sm-4
+                                            col-md-3 col-centered">
+                                                <div class="radio"
+                                                     id="candidate-{{ candidate.id }}">
+                                                    <input name="candidate-{{ candidate.id }}"
+                                                           id="candidate-{{ candidate.id }}-yes"
+                                                           type="radio"
+                                                           value="1"
+                                                           data-post="{{ post.id }}"
+                                                           data-candidate="{{ candidate.id }}"
+                                                           data-unique="true"
+                                                           checked
+                                                    />
+                                                    <label class="caption text-capitalize text-center"
+                                                           for="candidate-{{ candidate.id }}-yes">
+                                                        <h3 style="margin: 0;">{{ candidate.name }}</h3>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if humans|length > 1 %}
+
+                                            {% if candidate.is_nota %}
+                                                <div class="auto-candidate candidate text-center text-danger col-sm-4
+                                                col-md-3 col-centered">
+                                                    <div class="radio" id="candidate
+                                                    -{{ candidate.id }}">
+                                                        <input name="candidate-{{ candidate.id }}"
+                                                               id="candidate-{{ candidate.id }}-yes"
+                                                               type="radio"
+                                                               value="1"
+                                                               data-post="{{ post.id }}"
+                                                               data-candidate="{{ candidate.id }}"
+                                                               data-unique="true"
+                                                        />
+                                                        <label for="candidate-{{ candidate.id }}-yes">
+                                                            <h3 style="margin: 0;">{{ candidate.name }}</h3>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+
+                                    {% endfor %}
+                                {% endwith %}
+                            </div>
+
                             <div class="row row-centered candidate-list">
 
                                 {% for candidate in post.human_candidates %}
@@ -106,7 +168,7 @@
                                                 {% if election.display_manifesto and candidate.manifesto %}
                                                     <h4><a class="manifesto-url"
                                                            href="{{ candidate.manifesto.url }}"
-                                                           target="_blank">Manifesto</a> </h4>
+                                                           target="_blank">Manifesto</a></h4>
                                                 {% endif %}
 
                                                 {% comment %}Voting buttons {% endcomment %}
@@ -141,94 +203,29 @@
                                     </div>
                                 {% endfor %}
 
-                                <div class="candidate text-center col-sm-4 col-md-3 col-centered">
-                                    {% comment %}
-                                    The following piece of code is highly unoptimized and completely intentional.
-                                    {% endcomment %}
-                                    {% for candidate in post.auto_candidates %}
-                                        {% with humans=post.human_candidates %}
-                                            {% if humans|length > 1 %}
-
-                                                {% if candidate.is_nota %}
-                                                    <div style="min-height: 100px;" class="radio" id="candidate
-                                                    -{{ candidate.id }}">
-                                                        <input name="candidate-{{ candidate.id }}"
-                                                               id="candidate-{{ candidate.id }}-yes"
-                                                               type="radio"
-                                                               value="1"
-                                                               data-post="{{ post.id }}"
-                                                               data-candidate="{{ candidate.id }}"
-                                                               data-unique="true"
-                                                        />
-                                                        <label for="candidate-{{ candidate.id }}-yes">
-                                                            <h3 style="margin: 0;">{{ candidate.name }}</h3>
-                                                        </label>
-                                                    </div>
-                                                {% else %}
-                                                    <div style="min-height: 100px;" class="radio" id="candidate-{{ candidate.id }}">
-                                                        <input name="candidate-{{ candidate.id }}"
-                                                               id="candidate-{{ candidate.id }}-yes"
-                                                               type="radio"
-                                                               value="1"
-                                                               data-post="{{ post.id }}"
-                                                               data-candidate="{{ candidate.id }}"
-                                                               data-unique="true"
-                                                                {% if candidate.is_neutral %}
-                                                               checked
-                                                                {% endif %}
-                                                        />
-                                                        <label for="candidate-{{ candidate.id }}-yes">
-                                                            <h3 style="margin: 0;">{{ candidate.name }}</h3>
-                                                        </label>
-                                                    </div>
-                                                {% endif %}
-                                            {% else %}
-
-                                                {% if not candidate.is_nota %}
-                                                    <div style="min-height: 100px;" class="radio" id="candidate-{{ candidate.id }}">
-                                                        <input name="candidate-{{ candidate.id }}"
-                                                               id="candidate-{{ candidate.id }}-yes"
-                                                               type="radio"
-                                                               value="1"
-                                                               data-post="{{ post.id }}"
-                                                               data-candidate="{{ candidate.id }}"
-                                                               data-unique="true"
-                                                                {% if candidate.is_neutral %}
-                                                               checked
-                                                                {% endif %}
-                                                        />
-                                                        <label for="candidate-{{ candidate.id }}-yes">
-                                                            <h3 style="margin: 0;">{{ candidate.name }}</h3>
-                                                        </label>
-                                                    </div>
-                                                {% endif %}
-                                            {% endif %}
-                                        {% endwith %}
-
-                                    {% endfor %}
-                                </div>
-
                             </div>
+
                         </div>
-                        <hr>
+                        <hr/>
                     {% endfor %}
-                </div>
 
-                <div class="election-vote-cast center-block text-center">
-                    <form method="post" id="submit-vote" data-election="{{ election.id }}">
-                        {% csrf_token %}
-                        <input type="hidden" name="votes" id="submit-form-votes-inp"/>
-                        {% if election.is_key_required %}
-                            <div class="form-group col-xs-9">
-                                <label class="sr-only" for="election-{{ election.id }}-submit">Key</label>
-                                <input class="form-control" type="text" placeholder="Voting Key" name="key"
-                                       id="election-{{ election.id }}-key-input" required/>
-                            </div>
-                        {% endif %}
-                        <button class="btn btn-primary cast-vote" data-election="{{ election.id }}">Cast Vote
-                        </button>
-                    </form>
                 </div>
+            </div>
+
+            <div class="election-vote-cast center-block text-center">
+                <form method="post" id="submit-vote" data-election="{{ election.id }}">
+                    {% csrf_token %}
+                    <input type="hidden" name="votes" id="submit-form-votes-inp"/>
+                    {% if election.is_key_required %}
+                        <div class="form-group col-xs-9">
+                            <label class="sr-only" for="election-{{ election.id }}-submit">Key</label>
+                            <input class="form-control" type="text" placeholder="Voting Key" name="key"
+                                   id="election-{{ election.id }}-key-input" required/>
+                        </div>
+                    {% endif %}
+                    <button class="btn btn-primary cast-vote" data-election="{{ election.id }}">Cast Vote
+                    </button>
+                </form>
             </div>
         </div>
     </div>
