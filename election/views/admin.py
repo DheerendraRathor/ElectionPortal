@@ -94,12 +94,12 @@ class AddVotersView(TemplateView):
 
         if not file:
             messages.add_message(self.request, messages.ERROR, 'File can not be empty')
-            return self.get(self.request, *args, *kwargs)
+            return self.get(self.request, *args, **kwargs)
         try:
             roll_column = int(roll_column)
         except ValueError:
             messages.add_message(self.request, messages.ERROR, 'Roll Columns must be an integer')
-            return self.get(self.request, *args, *kwargs)
+            return self.get(self.request, *args, **kwargs)
 
         reader = csv.reader(codecs.iterdecode(file, 'utf-8', errors='ignore'), delimiter=',')
         index = 0
